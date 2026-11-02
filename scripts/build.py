@@ -75,7 +75,7 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         1, "Mathematics", "Algebra", "Class 11", "High", "Main + Adv",
         "Basic Mathematics, Sets, Modulus & Logarithms",
-        r"\b(basic math\w*|sets?\b|inequalit\w*|wavy curve|modulus|logarithm\w*|\blog\b)",
+        r"\b(basic math\w*|sets?\b|number system|fundamental of algebra|inequalit\w*|wavy curve|modulus|logarithm\w*|\blog\b)",
         "Basic Mathematics Logarithm Sets",
         "Sets Inequalities Logarithm Maths",
     ),
@@ -117,7 +117,7 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         7, "Mathematics", "Algebra", "Class 11", "High", "Main + Adv",
         "Binomial Theorem",
-        r"\b(binomial theorem|binomial expansion|multinomial|binomial\b)",
+        r"\b(binoi?mial theorem|binoi?mial expansion|multinomial|binoi?mial\b)",
         "Binomial Theorem",
         "Binomial Theorem Maths",
     ),
@@ -201,14 +201,14 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         19, "Mathematics", "Calculus", "Class 12", "High", "Main + Adv",
         "Continuity & Differentiability",
-        r"\b(continuity|differentiability|\blcd\b)",
+        r"\b(continuity|differentiabil\w*|\blcd\b)",
         "Continuity and Differentiability",
         "Continuity Differentiability Maths",
     ),
     (
         20, "Mathematics", "Calculus", "Class 12", "Medium", "Main + Adv",
         "Methods of Differentiation (MOD)",
-        r"\b(methods of differentiation|\bmod\b|differentiation|derivatives?\b)",
+        r"\b(methods? of differentiation|\bmod\b|differentiation|derivatives?\b)",
         "Methods of Differentiation",
         "Differentiation Class 12 Maths",
     ),
@@ -709,6 +709,12 @@ TEACHER_PLAYLIST_SWEEPS: list[tuple[str, str]] = [
     ("Mathematics", "JEE Challengers PW Mathematics"),
     ("Mathematics", "Neha Agrawal Mathematically Inclined JEE"),
     ("Mathematics", "BHANNAT MATHS JEE"),
+    ("Mathematics", "Om Sharma IIT JEE playlist"),
+    ("Mathematics", "Om Sharma Maths Let's Crack Olympiads"),
+    ("Mathematics", "Om Sharma JEE Legends"),
+    ("Mathematics", "Om Sharma Unacademy Accelerate"),
+    ("Mathematics", "Om Sharma Unacademy Math Matters"),
+    ("Mathematics", "Uplift Maths OM Sharma Sir"),
     ("Physics", "ABJ sir Physics Mohit Tyagi"),
     ("Physics", "Physics Galaxy Concept Videos"),
     ("Physics", "Physics Galaxy Revision Checklist"),
@@ -779,6 +785,15 @@ INSTITUTE_VIDEO_SWEEPS: list[tuple[str, str]] = [
     ("Mathematics", "Rankers JEE One Shot Maths"),
     ("Physics", "Rankers JEE One Shot Physics"),
     ("Chemistry", "Rankers JEE One Shot Chemistry"),
+    ("Mathematics", "Uplift Maths OM Sharma Sir"),
+    ("Mathematics", "Coordinate Geometry Om Sharma"),
+    ("Mathematics", "Trigonometry Om Sharma IIT JEE"),
+    ("Mathematics", "Algebra Om Sharma IIT JEE"),
+    ("Mathematics", "Integration Om Sharma IIT JEE"),
+    ("Mathematics", "Vector 3D Om Sharma IIT JEE"),
+    ("Mathematics", "Solution of Triangle Om Sharma"),
+    ("Mathematics", "Functional Equation Greatest Integer Om Sharma"),
+    ("Mathematics", "Statistics Om Sharma JEE Maths"),
 ]
 
 # Strict Curated Allowlist of Legitimate IIT-JEE Educators & Official Institute Channels
@@ -803,6 +818,8 @@ VERIFIED_CHANNEL_PATTERNS = (
     "kota pulse by unacademy",
     "unacademy accelerate",
     "unacademy catalysts",
+    "unacademy math matters",
+    "unacademy jee centres",
     "let's crack iit jee",
     "jee 24x7",
     "jee legends",
@@ -873,6 +890,7 @@ VERIFIED_CHANNEL_PATTERNS = (
     "akk sir",
     "ms chouhan",
     "sameer bansal",
+    "uplift maths",
     "physics heist",
     "khan academy india - english",
     "simply concise",
@@ -885,6 +903,8 @@ ADVANCED_FACULTY_CHANNELS = (
     "competishun",
     "mathsmerizing",
     "maths unplugged",
+    "uplift maths",
+    "unacademy math matters",
     "indian school of physics",
     "physics sir jee",
     "vinay uppal",
@@ -918,8 +938,8 @@ HARD_REJECT_RE = re.compile(
     r"vlog|prank|controversy|exposed|roast|reaction\s+video|cutoff|marks\s+vs\s+percentile|"
     r"college\s+review|hostel\s+tour|josaa|counselling|time\s*table|how\s+to\s+crack|"
     r"paper\s+solutions?|paper\s+discussion|question\s+paper\s+solutions?|video\s+solutions|answer\s+key|memory\s+based|"
-    r"toppers?\s+talk|topper'?s?\s+success|success\s+story|success\s+meet|full\s+interview|"
-    r"parents\s+of\s+jee|orientation\s+session|study\s+material\s+review|dress\s+code|admit\s+card|"
+    r"toppers?\s+talk|topper'?s?\s+success|success\s+story|success\s+meet|full\s+interview|interviewed\s+by|know\s+your\s+legend|"
+    r"parents\s+of\s+jee|orientation\s+session|study\s+material\s+review|book\s+review|book\s+secrets|how\s+to\s+use\s+pearson|chapter[- ]wise\s+strategy|decoding\s+jee\s+preparation|dress\s+code|admit\s+card|"
     r"strategy\s+to\s+score|best\s+books\s+for|motivation|motivational|shorts|#shorts)\b",
     re.I,
 )
@@ -1231,6 +1251,13 @@ def is_allen_channel(channel: str) -> bool:
     return any(k in low for k in ("allen jee", "allen career institute", "allen digital", "allen online"))
 
 
+def is_om_sharma_candidate(cand: dict) -> bool:
+    blob = f"{cand.get('title', '')} {cand.get('channel', '')}"
+    if re.search(r"\bhari\s*om\b|\bhariom\b|\bom\s+pandey\b", blob, re.I):
+        return False
+    return bool(re.search(r"uplift\s+maths|\bom\s+sharma\b|\bom\s+sir\b", blob, re.I))
+
+
 def is_verified_jee_channel(channel: str) -> bool:
     low = channel.casefold()
     # Reject NEET-only institute channels (e.g. ALLEN NEET, Sri Chaitanya Academy NEET, Aakash NEET)
@@ -1262,6 +1289,7 @@ def resolve_institute(cand: dict) -> str:
             "jee legends",
             "kota pulse",
             "let's crack iit jee",
+            "let's crack olympiads",
             "jee 24x7",
             "jee alchemy",
         )
@@ -1328,6 +1356,9 @@ def resolve_educator(cand: dict, subject: str, unit: str) -> str:
         if unit == "Organic Chemistry" or re.search(r"\bns\s*sir\b|\bneeraj saini\b", blob):
             return "NS Sir (Mohit Tyagi)"
         return "ALK Sir (Mohit Tyagi)"
+
+    if subject == "Mathematics" and is_om_sharma_candidate(cand):
+        return "Om Sharma Sir (Uplift Maths)"
 
     teacher_rules = [
         (r"\bnishant vora\b|\bnv\s*sir\b", "Nishant Vora (NV Sir)" if "motion" not in ch_low else "NV Sir (Motion Kota)"),
@@ -1459,13 +1490,28 @@ def classify_exam_and_format(cand: dict) -> tuple[str, str]:
     return exam, fmt
 
 
+OM_SHARMA_GATEWAY_PLAYLISTS: dict[str, int] = {
+    "PLyiKukNVH1DPDOSxkBr4PyTBibRpMgjaE": 1,   # CLASS 11 JEE MATHS Kota Modules (17 lec) -> Ch 01 Basic Maths/Sets/Log
+    "PLyiKukNVH1DMZhMEINGU-syGhd4XrspxK": 2,   # CLASS 12 JEE MATHS Kota Modules (16 lec) -> Ch 02 Relations & Functions
+    "PLAJfHGTj6RJ9E_1AXQ4AM4EHkFIz1zQbo": 20,  # Calculus by Om Sharma (34 lec) -> Ch 20 Methods of Differentiation
+    "PLMv3_4nOV2IA": 26,                       # JEE ADVANCED EXPRESS Brilliant Maths Problems (33 lec) -> Ch 26 JEE Adv Focus
+    "PLyiKukNVH1DPVkuc-yNSJebZkutE4tMBW": 29,  # JEE MAIN MATHEMATICS 2026 PYQs Solutions (5 marathons incl. Statistics) -> Ch 29
+}
+
+
 def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re: re.Pattern[str]) -> bool:
     title = cand["title"]
     channel = cand["channel"]
-    sample_titles = " ".join(s["title"] for s in cand.get("sample_lectures", []))
+    ch_low = channel.casefold()
 
     # 1. Must belong to our Verified IIT-JEE Educator / Official Institute Channel allowlist
-    if not is_verified_jee_channel(channel):
+    #    (Let's Crack Olympiads! is an official Unacademy channel hosting Om Sharma Sir's full IIT-JEE Maths courses)
+    is_om_on_lco = (
+        subject == "Mathematics"
+        and "let's crack olympiads" in ch_low
+        and is_om_sharma_candidate(cand)
+    )
+    if not (is_verified_jee_channel(channel) or is_om_on_lco):
         return False
 
     # 2. Reject NEET-only, Class 8/9/10, Regional non-English/Hindi, and non-lecture noise (evaluated on title)
@@ -1474,10 +1520,25 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     if re.search(r"\bneet\b", title, re.I) and not re.search(r"\b(jee|iit)\b", title, re.I):
         return False
 
+    # Gateway course playlists explicitly mapped to their opening Mathematics chapter
+    if cand["provider"] == "playlist" and cand["video_id"] in OM_SHARMA_GATEWAY_PLAYLISTS:
+        return OM_SHARMA_GATEWAY_PLAYLISTS[cand["video_id"]] == ch_no
+
     # 3. Prevent cross-chapter collisions on shared umbrella terms
-    if ch_no == 2 and re.search(r"\b(functional equations?|greatest integer|inverse trigonometr\w*|\bitf\b)\b", title, re.I):
+    if ch_no == 1 and re.search(r"\blet\s+[a-z]\s+be\s+the\s+set\b", title, re.I):
+        return False
+    if ch_no == 2 and re.search(
+        r"\b(functional equations?|greatest integer|inverse trigonometr\w*|\bitf\b|continuity|differentiabil\w*|limits?\b|logarithm\w*)\b",
+        title,
+        re.I,
+    ):
         return False
     if ch_no == 13 and re.search(r"\b(3\s*-?\s*d|three\s+dimension)", title, re.I):
+        return False
+    if ch_no == 28 and (
+        (re.search(r"\bvector\s*[-&]\s*3d\b", title, re.I) and not re.search(r"\b3d[\s-]*geometry\b", title, re.I))
+        or re.search(r"\bstatistics\b", title, re.I)
+    ):
         return False
     if ch_no == 43 and re.search(r"\bcapacit", title, re.I) and not re.search(r"\b(charges|coulomb|gauss)", title, re.I):
         return False
@@ -1485,6 +1546,9 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     if ch_no == 46 and re.search(r"\bmagnetism\s*(?:and|&)\s*matter\b", title, re.I):
         return False
     if ch_no == 47 and re.search(r"\bmoving charges\b", title, re.I) and not re.search(r"\bmatter\b", title, re.I):
+        return False
+    # Prevent Ch 20 (MOD) from stealing "Application of Derivatives" (Ch 21)
+    if ch_no == 20 and re.search(r"\bapplications? of derivatives?\b|\baod\b|\bmaxima\b|\bminima\b|\bmonotonicity\b|\btangent\b", title, re.I):
         return False
     # Prevent Ch 22/23 disambiguation
     if ch_no == 22 and re.search(r"\bdefinite integration\b", title, re.I) and not re.search(r"\bindefinite\b", title, re.I):
@@ -1639,6 +1703,11 @@ def build_corpus(use_cache: bool = True) -> dict:
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} ALLEN JEE", SP_PLAYLIST_ONLY))
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} ALLEN JEE", SP_LONG_VIDEOS))
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} Aakash BYJUS JEE", SP_LONG_VIDEOS))
+        # Dedicated Om Sharma Sir chapterwise Mathematics sweeps across all 29 JEE Maths chapters
+        if subject == "Mathematics":
+            chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} Om Sharma", SP_PLAYLIST_ONLY))
+            chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} Om Sharma", SP_LONG_VIDEOS))
+            chapter_tasks.append(("chapter", ch_no, subject, cre, f"{alt_q} Om Sharma Sir", ""))
 
     for subj, tq in TEACHER_PLAYLIST_SWEEPS:
         chapter_tasks.append(("sweep", 0, subj, None, tq, SP_PLAYLIST_ONLY))
@@ -1672,10 +1741,10 @@ def build_corpus(use_cache: bool = True) -> dict:
                 for c in items:
                     sweep_candidates.append((subject, c))
 
-    # Route teacher-sweep playlists into matching chapters (check specialized chapters first so Ch 26 beats Ch 02)
+    # Route teacher-sweep playlists into matching chapters (check specialized chapters first so Ch 26/19/21/29 beat umbrella chapters)
     priority_chapters = sorted(
         compiled_chapters,
-        key=lambda c: (0 if c[0] in {26, 11, 12, 28, 44, 47, 56, 61, 73} else 1, c[0]),
+        key=lambda c: (0 if c[0] in {26, 11, 12, 19, 21, 28, 29, 44, 47, 56, 61, 73} else 1, c[0]),
     )
     for subj, cand in sweep_candidates:
         for ch_no, c_subj, _, _, _, _, _, cre in priority_chapters:
@@ -1683,10 +1752,10 @@ def build_corpus(use_cache: bool = True) -> dict:
                 raw_results[ch_no].append(cand)
                 break
 
-    # Process specialized chapters first when claiming global deduplication keys so Ch 02 never steals Ch 26's playlist
+    # Process specialized chapters first when claiming global deduplication keys so Ch 02/20 never steal Ch 26/19/21's playlist
     processing_order = sorted(
         compiled_chapters,
-        key=lambda c: (0 if c[0] in {26, 11, 12, 22, 23, 24, 28, 44, 47, 56, 60, 61, 72, 73} else 1, c[0]),
+        key=lambda c: (0 if c[0] in {26, 11, 12, 19, 21, 22, 23, 24, 28, 29, 44, 47, 56, 60, 61, 72, 73} else 1, c[0]),
     )
 
     seen_global: set[tuple[str, str]] = set()
@@ -1773,6 +1842,32 @@ def build_corpus(use_cache: bool = True) -> dict:
         _try_take(playlists_pool, len(unique_ch) + 10, 2)
         if len(unique_ch) < 20:
             _try_take(videos_pool + playlists_pool, 22, 3)
+
+        # Specialist Educator Representation Pass: ensure verified specialist educators in this chapter
+        # (including Om Sharma Sir's full chapterwise playlists, Kota Module marathons & One-Shots,
+        # plus Mathsmerizing, INSP, Physics Sir JEE, Sachin Rana, etc.) are not dropped by the top-12 cap,
+        # while still sorting the entire chapter strictly by pure YouTube trend_score below.
+        if subject == "Mathematics":
+            om_pool = [
+                x
+                for x in (playlists_pool + videos_pool)
+                if is_om_sharma_candidate(x[6])
+                and (x[6]["provider"] == "playlist" or x[6].get("duration_sec", 0) >= 3600 or len([y for y in videos_pool if is_om_sharma_candidate(y[6])]) <= 2)
+            ]
+            if om_pool:
+                _try_take(om_pool, len(unique_ch) + 5, 3)
+
+        represented_educators = {r["educator"] for r in unique_ch}
+        specialist_pool = sorted(
+            [
+                x
+                for x in (videos_pool + playlists_pool)
+                if resolve_educator(x[6], subject, unit) not in represented_educators
+            ],
+            key=lambda x: -x[0],
+        )
+        if specialist_pool:
+            _try_take(specialist_pool, len(unique_ch) + 6, 2)
 
         # Sort strictly by pure YouTube trend_score (velocity + views + recency) — zero institute bias
         unique_ch.sort(
@@ -1986,7 +2081,23 @@ def self_test() -> None:
     assert resolve_institute({"title": "Conic Sections | BYJU'S JEE", "channel": "Aakash JEE"}) == "Aakash & BYJU'S"
     assert resolve_institute({"title": "BounceBack Calculus", "channel": "JEE Legends"}) == "Unacademy"
 
-    print("self-test ok (80 canonical IIT-JEE chapters, ALLEN priority & verified-channel guard validated)", flush=True)
+    assert is_verified_jee_channel("Uplift Maths : OM Sharma Sir")
+    assert not is_om_sharma_candidate({"title": "Class 12 Maths", "channel": "Hari Om Sharma"})
+    assert not is_om_sharma_candidate({"title": "Chemical Bonding | Om Pandey", "channel": "JEE Wallah"})
+    om_lco = {
+        "provider": "playlist",
+        "video_id": "PLAJfHGTj6RJ90aF9d5tnXzEuYLlCjSe7j",
+        "title": "Complex Number by Om Sharma",
+        "channel": "Let's Crack Olympiads!",
+        "lesson_count": 17,
+        "duration_sec": 0,
+        "view_count": 0,
+        "sample_lectures": [],
+    }
+    assert is_valid_chapter_candidate(om_lco, 4, "Mathematics", re.compile(r"\bcomplex numbers?\b", re.I))
+    assert resolve_educator(om_lco, "Mathematics", "Algebra") == "Om Sharma Sir (Uplift Maths)"
+
+    print("self-test ok (80 canonical IIT-JEE chapters, pure trend & verified-channel guard validated)", flush=True)
 
 
 def main(argv: list[str]) -> int:

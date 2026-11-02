@@ -9,11 +9,12 @@ window.TUBE_CONFIG = {
   heroSubtitle:
     "Every Physics, Chemistry & Maths chapter ranked purely by real YouTube student traction, monthly view velocity, and watch depth — built to solve your exact study problem in one click.",
   searchPlaceholder:
-    "Search any chapter, concept, or teacher (e.g. Rotational torque, GOC, Definite Integration, ABJ Sir, BounceBack)…",
+    "Search any chapter, concept, or teacher (e.g. Rotational torque, GOC, Definite Integration, Om Sharma Sir, ABJ Sir)…",
   quickProblems: [
     { label: "🔥 Rotational Motion & Torque", query: "rotational" },
     { label: "🧪 GOC & Resonance", query: "goc" },
     { label: "∫ Definite Integration", query: "definite integration" },
+    { label: "📘 Om Sharma Sir Maths", subject: "Mathematics", query: "om sharma" },
     { label: "⚡ Electrostatics in 1 Shot", query: "electrostatics", mode: "oneshot" },
     { label: "🧬 Coordination Compounds", query: "coordination" },
     { label: "🎯 Calculus PYQ Boosters", query: "calculus", mode: "pyq" },
