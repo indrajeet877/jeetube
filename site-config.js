@@ -2,22 +2,23 @@ window.TUBE_CONFIG = {
   platformId: "jee",
   brandName: "JEETube",
   brandSymbol: "∑",
-  tagline: "IIT-JEE Main & Advanced",
+  tagline: "IIT-JEE · Engineering CETs · Boards",
   storagePrefix: "jeetube",
   heroBadge: "100% Pure YouTube Trend Ranking · Zero Paid or Coaching Bias",
   heroTitle: "Stuck on a JEE chapter? Fix it with the #1 trending video.",
   heroSubtitle:
-    "Every Physics, Chemistry & Maths chapter ranked purely by real YouTube student traction, monthly view velocity, and watch depth — built to solve your exact study problem in one click.",
+    "Every Physics, Chemistry & Maths chapter for IIT-JEE, BITSAT, State Engineering CETs & Class 12 Boards across Hinglish, English, Hindi, Telugu, Tamil, Malayalam, Kannada, Marathi, Bengali, Gujarati & Odia — ranked purely by real YouTube student traction and view velocity.",
   searchPlaceholder:
-    "Search any chapter, concept, or teacher (e.g. Rotational torque, GOC, Definite Integration, Om Sharma Sir, ABJ Sir)…",
+    "Search any chapter, language, exam, or teacher (e.g. Rotational, GOC, Om Sharma Sir, Telugu EAPCET, MHT-CET, CBSE Boards)…",
   quickProblems: [
     { label: "🔥 Rotational Motion & Torque", query: "rotational" },
     { label: "🧪 GOC & Resonance", query: "goc" },
     { label: "∫ Definite Integration", query: "definite integration" },
     { label: "📘 Om Sharma Sir Maths", subject: "Mathematics", query: "om sharma" },
+    { label: "🎯 State CETs & BITSAT", exam: "State CETs & BITSAT" },
+    { label: "🏫 Class 12 PCM Boards", exam: "Class 12 & Boards", mode: "oneshot" },
     { label: "⚡ Electrostatics in 1 Shot", query: "electrostatics", mode: "oneshot" },
     { label: "🧬 Coordination Compounds", query: "coordination" },
-    { label: "🎯 Calculus PYQ Boosters", query: "calculus", mode: "pyq" },
   ],
   subjectMeta: {
     Mathematics: { icon: "∫", short: "Maths", tone: "s1" },
@@ -73,19 +74,25 @@ window.TUBE_CONFIG = {
     {
       id: "jee",
       name: "JEETube",
-      sub: "IIT-JEE",
+      sub: "IIT-JEE & Engg",
       url: "https://indrajeet877.github.io/jeetube/",
     },
     {
       id: "neet",
       name: "NEETTube",
-      sub: "NEET UG",
+      sub: "NEET & Medical",
       url: "https://indrajeet877.github.io/neettube/",
+    },
+    {
+      id: "board",
+      name: "BoardTube",
+      sub: "CBSE & Boards",
+      url: "https://indrajeet877.github.io/boardtube/",
     },
     {
       id: "olympiad",
       name: "OlympiadTube",
-      sub: "IOQM · NSEP · INOI",
+      sub: "IMO · IOQM · AIME · INOI",
       url: "https://indrajeet877.github.io/olympiadtube/",
     },
     {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build JEETube's 80-chapter IIT-JEE Main & Advanced YouTube index (data/videos.json).
+"""Build JEETube's 80-chapter IIT-JEE, Engineering CETs & Class 12 PCM YouTube index (data/videos.json).
 
 Pure Python 3 standard library. Run from anywhere:
 
@@ -10,9 +10,10 @@ Pure Python 3 standard library. Run from anywhere:
 Queries YouTube's public web search endpoint across all 80 canonical IIT-JEE Main &
 Advanced chapters (Mathematics: 29, Physics: 25, Chemistry: 26) using clean, focused
 YouTube queries across both YouTube's native Playlist filter (sp=EgIQAw==) and
-Long-Form Lecture filter (sp=EgIYAg==), plus 36 educator-specific playlist sweeps.
-Enforces a strict Verified JEE Educator/Institute Channel allowlist, chapter-matching,
-cross-subject guards, and NEET/regional/clickbait rejection.
+Long-Form Lecture filter (sp=EgIYAg==), plus educator, regional-language, State CET,
+BITSAT, and Class 12 PCM Board sweeps across all popular Indian languages.
+Enforces a strict Verified Educator/Institute Channel allowlist, chapter-matching,
+cross-subject guards, NEET-biology/clickbait rejection, and 100% pure YouTube trend ranking.
 """
 
 from __future__ import annotations
@@ -638,6 +639,93 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     ),
 ]
 
+# Bilingual (Hindi Devanagari) & State-Board / NCERT Chapter Alias Map (compiled into chapter_re)
+BILINGUAL_CHAPTER_ALIASES: dict[int, str] = {
+    # Mathematics (1..29)
+    1: r"मूलभूत गणित|समुच्चय|लघुगणक|असमिका",
+    2: r"संबंध एवं फलन|संबंध तथा फलन|संबंध और फलन|સંબંધ અને વિધેય|સબંધ અને વિધેય",
+    3: r"द्विघात समीकरण|वर्ग समीकरण",
+    4: r"सम्मिश्र संख्या",
+    5: r"अनुक्रम तथा श्रेणी|अनुक्रम एवं श्रेणी|समांतर श्रेणी|गुणोत्तर श्रेणी",
+    6: r"क्रमचय एवं संचय|क्रमचय तथा संचय|क्रमचय और संचय",
+    7: r"द्विपद प्रमेय",
+    8: r"आव्यूह|सारणिक|શ્રેણિક|નિશ્ચાયક",
+    9: r"प्रायिकता|સંભાવના",
+    10: r"त्रिकोणमितीय फलन|त्रिकोणमिति",
+    11: r"प्रतिलोम त्रिकोणमितीय|ત્રિકોણમિતિય પ્રતિવિધેયો",
+    12: r"त्रिभुजों के गुण|त्रिभुज के गुणधर्म",
+    13: r"सरल रेखा",
+    14: r"(?:^|[\s|(,-])वृत्त(?:$|[\s|),-])",
+    15: r"परवलय",
+    16: r"दीर्घवृत्त",
+    17: r"अतिपरवलय",
+    18: r"सीमा एवं अवकलज|सीमा और अवकलज",
+    19: r"सातत्य तथा अवकलनीयता|सांतत्य तथा अवकलनीयता|सततता एवं अवकलनीयता|સાતત્ય અને વિકલનીયતા",
+    20: r"अवकलन(?!ीय)",
+    21: r"अवकलज के अनुप्रयोग|अवकलजों के अनुप्रयोग|उच्चिष्ठ एवं निम्निष्ठ|स्पर्श रेखा|વિકલિતના ઉપયોગો",
+    22: r"\b(?:integrals?|integration)\b|अनिश्चित समाकलन|समाकलन(?!ों के अनुप्रयोग)|સંકલન",
+    23: r"निश्चित समाकलन",
+    24: r"समाकलनों के अनुप्रयोग|समाकलन के अनुप्रयोग|वक्रों के अंतर्गत क्षेत्रफल",
+    25: r"अवकल समीकरण|વિકલ સમીકરણ",
+    26: r"महत्तम पूर्णांक फलन",
+    27: r"सदिश बीजगणित|सदिश|સદિશ",
+    28: r"त्रिविमीय ज्यामिति|त्रि-विमीय ज्यामिति",
+    29: r"सांख्यिकी",
+    # Physics (30..54)
+    30: r"मात्रक एवं मापन|मात्रक और मापन|विमीय विश्लेषण",
+    31: r"सरल रेखा में गति|समतल में गति|प्रक्षेप्य गति|शुद्धगतिकी",
+    32: r"गति के नियम|घर्षण",
+    33: r"कार्य,? ऊर्जा (?:एवं|और|तथा) शक्ति|कार्य ऊर्जा|वृत्तीय गति",
+    34: r"द्रव्यमान केंद्र|संवेग संरक्षण|संघट्ट",
+    35: r"घूर्णी गति|कणों के निकाय तथा घूर्णी गति|जड़त्व आघूर्ण|बल आघूर्ण",
+    36: r"गुरुत्वाकर्षण",
+    37: r"तरलों के यांत्रिक गुण|पृष्ठ तनाव|श्यानता|तरल यांत्रिकी",
+    38: r"ठोसों के यांत्रिक गुण|प्रत्यास्थता",
+    39: r"सरल आवर्त गति|दोलन",
+    40: r"ध्वनि तरंग|तरंग गति|डॉप्लर प्रभाव",
+    41: r"द्रव्य के तापीय गुण|ऊष्मा स्थानांतरण|कैलोरीमिति",
+    42: r"ऊष्मागतिकी|अणुगति सिद्धांत",
+    43: r"स्थिर वैद्युतिकी|वैद्युत आवेश तथा क्षेत्र|विद्युत आवेश तथा क्षेत्र|गॉस का नियम|વિદ્યુતભારો અને ક્ષેત્રો",
+    44: r"स्थिर वैद्युत विभव तथा धारिता|विद्युत विभव तथा धारिता|संधारित्र|धारिता|સ્થિત વિદ્યુતસ્થિતિમાન અને કેપેસિટન્સ",
+    45: r"विद्युत धारा|वैद्युत धारा|किरचॉफ|પ્રવાહ વિદ્યુત",
+    46: r"गतिमान आवेश और चुंबकत्व|गतिमान आवेश एवं चुंबकत्व|विद्युत धारा का चुंबकीय प्रभाव|ગતિમાન વિદ્યુતભારો અને ચુંબકત્વ",
+    47: r"\bmagnetic materials\b|चुंबकत्व एवं द्रव्य|चुंबकत्व और द्रव्य|ચુંબકત્વ અને દ્રવ્ય",
+    48: r"वैद्युतचुंबकीय प्रेरण|विद्युत चुम्बकीय प्रेरण|विद्युत चुंबकीय प्रेरण|વિદ્યુતચુંબકીય પ્રેરણ",
+    49: r"प्रत्यावर्ती धारा|वैद्युतचुंबकीय तरंग|विद्युत चुम्बकीय तरंग|પ્રત્યાવર્તી પ્રવાહ",
+    50: r"किरण प्रकाशिकी|प्रकाशिकी|કિરણ પ્રકાશશાસ્ત્ર",
+    51: r"तरंग प्रकाशिकी|व्यतिकरण|विवर्तन|તરંગ પ્રકાશશાસ્ત્ર",
+    52: r"विकिरण तथा द्रव्य की द्वैत प्रकृति|प्रकाश विद्युत प्रभाव|आधुनिक भौतिकी",
+    53: r"नाभिकीय भौतिकी|रेडियोधर्मिता|(?:^|[\s|(,-])नाभिक(?:$|[\s|),-])",
+    54: r"अर्धचालक|लॉजिक गेट|અર્ધવાહક",
+    # Chemistry (55..80)
+    55: r"मोल संकल्पना|रसायन विज्ञान की कुछ मूल अवधारणा",
+    56: r"अपचयोपचय|रेडॉक्स अभिक्रिया|ऑक्सीकरण",
+    57: r"परमाणु की संरचना|परमाणु संरचना",
+    58: r"द्रव्य की अवस्था|गैसीय अवस्था",
+    59: r"रासायनिक ऊष्मागतिकी|ऊष्मागतिकी|ऊष्मारसायन",
+    60: r"\bchemical equilibri(?:um|a)\b|रासायनिक साम्य|साम्यावस्था",
+    61: r"\bionic equilibri(?:um|a)\b|आयनिक साम्य",
+    62: r"विलयन|अणुसंख्य गुणधर्म|દ્રાવણો",
+    63: r"वैद्युतरसायन|विद्युत रसायन|વિદ્યુતરસાયણ",
+    64: r"रासायनिक बलगतिकी|રાસાયણિક ગતિકી",
+    65: r"ठोस अवस्था|पृष्ठ रसायन",
+    66: r"आवर्त सारणी|तत्वों का वर्गीकरण",
+    67: r"रासायनिक आबंधन|आण्विक संरचना",
+    68: r"उपसहसंयोजन यौगिक|उपसहसंयोजक यौगिक",
+    69: r"पी-?\s*ब्लॉक|p-?\s*ब्लॉक",
+    70: r"\bd[\s,&-]*f[\s-]*block\b|डी\s*(?:एवं|और|तथा)\s*एफ\s*ब्लॉक|d\s*(?:एवं|और|तथा)\s*f\s*ब्लॉक|धातुकर्म",
+    71: r"गुणात्मक विश्लेषण|लवण विश्लेषण|s-?\s*ब्लॉक",
+    72: r"आईयूपीएसी|नामकरण",
+    73: r"समावयवता|त्रिविम समावयवता",
+    74: r"सामान्य कार्बनिक रसायन|कार्बनिक रसायन\s*:?\s*कुछ आधारभूत सिद्धांत",
+    75: r"हाइड्रोकार्बन|अभिक्रिया क्रियाविधि",
+    76: r"\bhalogen derivatives?\b|हैलोऐल्केन|हैलोएल्केन|हैलोऐरीन",
+    77: r"ऐल्कोहॉल|एल्कोहॉल|फीनॉल|ईथर",
+    78: r"ऐल्डिहाइड|एल्डिहाइड|कीटोन|कार्बोक्सिलिक",
+    79: r"ऐमीन|एमीन|डाइऐजोनियम",
+    80: r"जैव-?\s*अणु|बहुलक",
+}
+
 TEACHER_PLAYLIST_SWEEPS: list[tuple[str, str]] = [
     # ALLEN Top Priority Sweeps
     ("Mathematics", "ALLEN JEE Mathematics"),
@@ -739,6 +827,62 @@ TEACHER_PLAYLIST_SWEEPS: list[tuple[str, str]] = [
     ("Chemistry", "Sakshi Vora Vora Classes Chemistry"),
     ("Chemistry", "Pankaj Sir Chemistry JEE"),
     ("Chemistry", "Canvas Classes Pahul sir Chemistry"),
+    # All-India Regional Languages, Engineering CETs & Class 12 PCM Board Playlist Sweeps
+    ("Mathematics", "Vedantu Telugu JEE Maths"),
+    ("Physics", "Vedantu Telugu JEE Physics"),
+    ("Chemistry", "Vedantu Telugu JEE Chemistry"),
+    ("Mathematics", "PW Telugu Maths EAPCET JEE"),
+    ("Physics", "PW Telugu Physics EAPCET JEE"),
+    ("Chemistry", "PW Telugu Chemistry EAPCET JEE"),
+    ("Mathematics", "Vedantu Master Tamil JEE Maths"),
+    ("Physics", "Vedantu Master Tamil JEE Physics"),
+    ("Chemistry", "Vedantu Master Tamil JEE Chemistry"),
+    ("Mathematics", "PW Tamil JEE Class 12 Maths"),
+    ("Physics", "PW Tamil JEE Class 12 Physics"),
+    ("Chemistry", "PW Tamil JEE Class 12 Chemistry"),
+    ("Mathematics", "Xylem JEE KEAM Maths Malayalam"),
+    ("Physics", "Xylem Plus Two Physics Malayalam"),
+    ("Chemistry", "Xylem Plus Two Chemistry Malayalam"),
+    ("Mathematics", "Eduport Plus Two Maths Malayalam"),
+    ("Physics", "Eduport Plus Two Physics KEAM"),
+    ("Physics", "SimplifiedMinds 2nd PUC KCET Physics"),
+    ("Mathematics", "SimplifiedMinds 2nd PUC KCET Maths"),
+    ("Chemistry", "SimplifiedMinds 2nd PUC KCET Chemistry"),
+    ("Physics", "Educare Karnataka 2nd PUC Physics Kannada"),
+    ("Physics", "PW Kannada KCET 2nd PUC Physics"),
+    ("Chemistry", "PW Kannada KCET 2nd PUC Chemistry"),
+    ("Mathematics", "PW Kannada KCET 2nd PUC Maths"),
+    ("Mathematics", "Dinesh Sir MHT CET Class 12 Maths"),
+    ("Physics", "Physics Gyan Mukesh Nayak Class 12 HSC MHT CET"),
+    ("Chemistry", "Sovind Sir All About Chemistry MHT CET Class 12"),
+    ("Physics", "PW Maharashtra MHT CET HSC Physics"),
+    ("Mathematics", "PW Maharashtra MHT CET HSC Maths"),
+    ("Chemistry", "BongMistry Class 12 Chemistry Bangla"),
+    ("Physics", "PW Bangla Class 12 WBJEE Physics"),
+    ("Chemistry", "PW Bangla Class 12 WBJEE Chemistry"),
+    ("Mathematics", "PW Bangla Class 12 WBJEE Maths"),
+    ("Physics", "SOE Bangla Class 12 HS Physics"),
+    ("Physics", "PW Gujarati Class 12 GUJCET Physics"),
+    ("Chemistry", "PW Gujarati Class 12 GUJCET Chemistry"),
+    ("Mathematics", "PW Gujarati Class 12 GUJCET Maths"),
+    ("Chemistry", "Nimeshsir Class 12 Chemistry GUJCET Gujarati"),
+    ("Physics", "PW Odia Class 12 CHSE Physics"),
+    ("Chemistry", "PW Odia Class 12 CHSE Chemistry"),
+    ("Mathematics", "PW Odia Class 12 CHSE Maths"),
+    ("Physics", "MatSci Odia Class 12 Physics CHSE"),
+    ("Physics", "PW Punjabi Class 12 Physics PSEB"),
+    ("Chemistry", "PW Punjabi Class 12 Chemistry PSEB"),
+    ("Physics", "PW Hindi Medium IIT JEE Physics"),
+    ("Chemistry", "PW Hindi Medium IIT JEE Chemistry"),
+    ("Mathematics", "PW Hindi Medium IIT JEE Maths"),
+    ("Physics", "Ashish Singh Lectures Class 12 Physics Hindi Medium"),
+    ("Chemistry", "Ashish Singh Lectures Class 12 Chemistry Hindi Medium"),
+    ("Mathematics", "Learn and Share Class 12 Maths Hindi Medium"),
+    ("Chemistry", "Bharat Panchal Class 12 Chemistry CBSE"),
+    ("Chemistry", "Sourabh Raina Class 12 Chemistry Revision"),
+    ("Physics", "Arvind Academy Class 12 Physics CBSE"),
+    ("Physics", "Abhishek Sahu Class 12 Physics"),
+    ("Mathematics", "NCERT Wallah Class 12 Maths Vijeta"),
 ]
 
 INSTITUTE_VIDEO_SWEEPS: list[tuple[str, str]] = [
@@ -794,10 +938,115 @@ INSTITUTE_VIDEO_SWEEPS: list[tuple[str, str]] = [
     ("Mathematics", "Solution of Triangle Om Sharma"),
     ("Mathematics", "Functional Equation Greatest Integer Om Sharma"),
     ("Mathematics", "Statistics Om Sharma JEE Maths"),
+    # Telugu JEE / AP & TS EAPCET / EAMCET One-Shots
+    ("Mathematics", "Vedantu Telugu JEE Maths One Shot EAPCET"),
+    ("Physics", "Vedantu Telugu JEE Physics One Shot EAPCET"),
+    ("Chemistry", "Vedantu Telugu JEE Chemistry One Shot EAPCET"),
+    ("Mathematics", "PW Telugu Maths One Shot JEE EAMCET"),
+    ("Physics", "PW Telugu Physics One Shot JEE EAMCET"),
+    ("Chemistry", "PW Telugu Chemistry One Shot JEE EAMCET"),
+    ("Mathematics", "Unacademy Telugu JEE EAMCET Maths One Shot"),
+    # Tamil JEE / Class 12 One-Shots
+    ("Mathematics", "Vedantu Master Tamil Class 12 JEE Maths One Shot"),
+    ("Physics", "Vedantu Master Tamil Class 12 JEE Physics One Shot"),
+    ("Chemistry", "Vedantu Master Tamil Class 12 JEE Chemistry One Shot"),
+    ("Physics", "Vedantu JEE Vaathi Physics One Shot Tamil"),
+    ("Chemistry", "Vedantu JEE Vaathi Chemistry One Shot Tamil"),
+    ("Mathematics", "PW Tamil Class 12 Maths One Shot"),
+    ("Physics", "PW Tamil Class 12 Physics One Shot"),
+    ("Chemistry", "Hundred Learning Class 12 Chemistry Tamil"),
+    # Malayalam JEE / KEAM / Plus Two One-Shots
+    ("Mathematics", "Xylem Plus Two Maths One Shot Malayalam"),
+    ("Physics", "Xylem Plus Two Physics One Shot Malayalam"),
+    ("Chemistry", "Xylem Plus Two Chemistry One Shot Malayalam"),
+    ("Mathematics", "Xylem JEE KEAM Maths One Shot"),
+    ("Physics", "Xylem JEE KEAM Physics One Shot"),
+    ("Chemistry", "Xylem JEE KEAM Chemistry One Shot"),
+    ("Physics", "Exam Winner Plus Two Physics Chapter Revision"),
+    ("Chemistry", "Exam Winner Plus Two Chemistry Chapter Revision"),
+    ("Mathematics", "Eduport Plus Two Maths Marathon Malayalam"),
+    # Kannada KCET / JEE / 2nd PUC One-Shots
+    ("Physics", "SimplifiedMinds KCET 2nd PUC Physics One Shot"),
+    ("Mathematics", "SimplifiedMinds KCET 2nd PUC Maths One Shot"),
+    ("Chemistry", "SimplifiedMinds KCET 2nd PUC Chemistry One Shot"),
+    ("Physics", "PW Kannada 2nd PUC KCET Physics One Shot"),
+    ("Chemistry", "PW Kannada 2nd PUC KCET Chemistry One Shot"),
+    ("Mathematics", "PW Kannada 2nd PUC KCET Maths One Shot"),
+    ("Physics", "Educare Karnataka 2nd PUC Physics One Shot Kannada"),
+    ("Physics", "Parikshe 2nd PUC Physics One Shot Kannada"),
+    # Marathi MHT-CET / Maharashtra HSC One-Shots
+    ("Mathematics", "Dinesh Sir MHT CET Maths One Shot"),
+    ("Mathematics", "Dinesh Sir Class 12 HSC Maths One Shot"),
+    ("Physics", "Physics Gyan Mukesh Nayak MHT CET One Shot"),
+    ("Chemistry", "Sovind Sir MHT CET Chemistry One Shot"),
+    ("Physics", "Sahyadri Tutorials MHT CET Physics"),
+    ("Physics", "New Indian Era Class 12 Physics HSC One Shot"),
+    ("Mathematics", "Pawan Wagh Academy Class 12 Maths Marathi"),
+    ("Chemistry", "PW Maharashtra MHT CET Chemistry One Shot"),
+    # Bengali WBJEE / WBCHSE HS One-Shots
+    ("Chemistry", "BongMistry One Shot Class 12 WBJEE"),
+    ("Physics", "PW Bangla WBJEE HS Physics One Shot"),
+    ("Chemistry", "PW Bangla WBJEE HS Chemistry One Shot"),
+    ("Mathematics", "PW Bangla WBJEE HS Maths One Shot"),
+    ("Physics", "Science Beta Class 12 Physics Bangla"),
+    ("Mathematics", "SOE Bangla Class 12 Maths One Shot"),
+    ("Physics", "Unacademy Bangla WBJEE Physics One Shot"),
+    # Gujarati GUJCET / GSEB One-Shots
+    ("Physics", "PW Gujarati Class 12 Physics One Shot GUJCET"),
+    ("Chemistry", "PW Gujarati Class 12 Chemistry One Shot GUJCET"),
+    ("Mathematics", "PW Gujarati Class 12 Maths One Shot GUJCET"),
+    ("Physics", "PW Gujarat 11 12 Physics One Shot GSHSEB"),
+    ("Chemistry", "PW Gujarat 11 12 Chemistry One Shot GSHSEB"),
+    ("Physics", "Vidyakul Gujarati Std 12 Physics GUJCET"),
+    ("Chemistry", "Nimeshsir Std 12 Chemistry GUJCET Gujarati"),
+    ("Mathematics", "Youth Vidyakul Std 12 Maths Gujarati"),
+    # Odia OJEE / CHSE One-Shots
+    ("Physics", "PW Odia Class 12 Physics One Shot CHSE"),
+    ("Chemistry", "PW Odia Class 12 Chemistry One Shot CHSE"),
+    ("Mathematics", "PW Odia Class 12 Maths One Shot CHSE"),
+    ("Chemistry", "PW Odisha 11th 12th Class 12 Chemistry One Shot"),
+    ("Chemistry", "CHSE Catalyst Class 12 Chemistry Odia"),
+    ("Physics", "CHSE Catalyst Class 12 Physics Odia"),
+    # Punjabi PSEB One-Shots
+    ("Physics", "PW Punjabi Class 12 Physics One Shot"),
+    ("Chemistry", "PW Punjabi Class 12 Chemistry One Shot"),
+    ("Mathematics", "PW Punjabi Class 12 Maths One Shot"),
+    ("Physics", "PW Punjab Board Class 12 Physics One Shot PSEB"),
+    ("Chemistry", "PW Punjab Board Class 12 Chemistry One Shot PSEB"),
+    ("Mathematics", "PW Punjab Board Class 12 Maths One Shot PSEB"),
+    # Hindi Medium IIT-JEE & Class 12 PCM One-Shots
+    ("Physics", "PW Hindi Medium JEE One Shot Physics"),
+    ("Chemistry", "PW Hindi Medium JEE One Shot Chemistry"),
+    ("Mathematics", "PW Hindi Medium JEE One Shot Maths"),
+    ("Physics", "Ashish Singh Lectures Class 12 Physics One Shot"),
+    ("Chemistry", "Ashish Singh Lectures Class 12 Chemistry One Shot"),
+    ("Physics", "Learn and Share Class 12 Physics One Shot"),
+    ("Mathematics", "Learn and Share Class 12 Maths One Shot"),
+    ("Physics", "Science Sangrah Class 12 Physics One Shot Hindi"),
+    ("Chemistry", "Science Sangrah Class 12 Chemistry One Shot Hindi"),
+    # BITSAT, VITEEE, COMEDK & Engineering Entrances
+    ("Mathematics", "BITSAT Maths One Shot Vora Classes MathonGo"),
+    ("Physics", "BITSAT Physics One Shot Eduniti Vedantu JEE"),
+    ("Chemistry", "BITSAT Chemistry One Shot Vora Classes Vedantu JEE"),
+    ("Mathematics", "VITEEE COMEDK Maths One Shot Vedantu JEE"),
+    ("Physics", "KCET COMEDK Physics One Shot"),
+    ("Mathematics", "WBJEE Maths One Shot Unacademy JEE"),
+    # Class 12 CBSE PCM Board One-Shots
+    ("Chemistry", "Bharat Panchal Class 12 Chemistry One Shot Boards"),
+    ("Chemistry", "Sourabh Raina Class 12 Chemistry Complete Revision"),
+    ("Physics", "Arvind Academy Class 12 Physics One Shot Boards"),
+    ("Physics", "Munil Sir Class 12 Physics One Shot"),
+    ("Physics", "Abhishek Sahu Class 12 Physics Full Chapter One Shot"),
+    ("Physics", "Radhika Classes Class 12 Physics One Shot"),
+    ("Physics", "Science and Fun Ashu Ghai Class 12 Physics One Shot"),
+    ("Mathematics", "Science and Fun Class 12 Maths One Shot"),
+    ("Physics", "NCERT Wallah Class 12 Physics Vijeta One Shot"),
+    ("Chemistry", "NCERT Wallah Class 12 Chemistry Vijeta One Shot"),
+    ("Mathematics", "NCERT Wallah Class 12 Maths Vijeta One Shot"),
 ]
 
-# Strict Curated Allowlist of Legitimate IIT-JEE Educators & Official Institute Channels
-# Guarantees ZERO spam/profane/random personal accounts or non-JEE teaching channels.
+# Strict Curated Allowlist of Legitimate IIT-JEE, Engineering CET & Class 12 PCM Educators & Official Channels
+# Guarantees ZERO spam/profane/random personal accounts or non-PCM teaching channels.
 VERIFIED_CHANNEL_PATTERNS = (
     # ALLEN (Top Priority)
     "allen jee",
@@ -824,16 +1073,42 @@ VERIFIED_CHANNEL_PATTERNS = (
     "jee 24x7",
     "jee legends",
     "jee alchemy",
+    "unacademy class 11",
+    "unacademy class 12",
     # Competishun / Mohit Tyagi
     "mohit tyagi",
     "competishun",
-    # Physics Wallah (PW)
+    # Physics Wallah (PW) Pan-India, Regional & NCERT/Boards
     "jee wallah",
     "physics wallah",
     "lakshya jee",
     "arjuna jee",
     "jee challengers",
     "pw jee",
+    "ncert wallah",
+    "cbse wallah",
+    "vijeta",
+    "pw hindi",
+    "pw telugu",
+    "pw telangana",
+    "pw andhra",
+    "pw tamil",
+    "pw malayalam",
+    "pw kannada",
+    "pw kcet",
+    "pw maharashtra",
+    "pw mht cet",
+    "mht cet wallah",
+    "pw bangla",
+    "pw wbjee",
+    "pw gujarati",
+    "pw gujarat",
+    "pw odia",
+    "pw odisha",
+    "pw punjabi",
+    "pw punjab",
+    "punjab wallah",
+    "pw class 11 & 12 - english",
     # VMC, Sri Chaitanya / Infinity Learn, Motion, Etoos, Reliable, Resonance, eSaral, ATP STAR
     "vmc jee",
     "vidyamandir classes",
@@ -856,6 +1131,8 @@ VERIFIED_CHANNEL_PATTERNS = (
     "rankers- jee",
     "rankers jee",
     "vedantu jee",
+    "vedantu ncert",
+    "vedantu math",
     "apni kaksha",
     "careerwill",
     "iit school",
@@ -868,6 +1145,7 @@ VERIFIED_CHANNEL_PATTERNS = (
     "vora classes",
     "mathongo",
     "jeeongo",
+    "phodu club",
     "dexterchem",
     "sachin rana",
     "iitian explains",
@@ -896,6 +1174,92 @@ VERIFIED_CHANNEL_PATTERNS = (
     "simply concise",
     "jee simplified",
     "mr. exponent",
+    # Telugu (JEE / AP & TS EAPCET / IPE)
+    "vedantu telugu",
+    "physics wallah telugu",
+    "unacademy telugu",
+    "ajay jummidi",
+    "kiran sir",
+    # Tamil (JEE / Vaathi / Class 12 Tamil)
+    "vedantu master tamil",
+    "vedantu jee vaathi",
+    "physics wallah tamil",
+    "hundred learning",
+    "alexmaths",
+    "alex maths",
+    # Malayalam (JEE / KEAM / Kerala Plus Two)
+    "xylem",
+    "eduport",
+    "exam winner",
+    "brilliant pala",
+    "physics wallah malayalam",
+    # Kannada (KCET / JEE / Karnataka 2nd PUC)
+    "simplifiedminds",
+    "simplified minds",
+    "educare karnataka",
+    "educare light for life",
+    "physics wallah kannada",
+    "parikshe",
+    "vedantu karnataka",
+    "deeksha karnataka",
+    # Marathi (MHT-CET / Maharashtra HSC)
+    "dinesh sir",
+    "physics gyan",
+    "physics gyaan",
+    "mukesh nayak",
+    "sovind sir",
+    "all about chemistry",
+    "new indian era",
+    "sahyadri tutorials",
+    "giri tutorials",
+    "pawan wagh",
+    "physics wallah maharashtra",
+    "v maharashtra",
+    # Bengali (WBJEE / WBCHSE HS)
+    "physics wallah bangla",
+    "bongmistry",
+    "soe bangla",
+    "science beta",
+    "unacademy bangla",
+    # Gujarati (GUJCET / GSEB)
+    "physics wallah gujarati",
+    "vidyakul",
+    "youth education",
+    "diwalipura",
+    "nimeshsir",
+    "nimesh sir",
+    "priyeshsir",
+    # Odia (OJEE / CHSE Odisha)
+    "physics wallah odia",
+    "chse catalyst",
+    "matsci odia",
+    "matsci science",
+    "rkd classes",
+    "dear ramesh",
+    # Punjabi (PSEB)
+    "physics wallah punjabi",
+    "pseb",
+    # Hindi Medium (IIT-JEE & UP/Bihar/RBSE Class 12 PCM)
+    "physics wallah hindi",
+    "ashish singh lectures",
+    "learn and share",
+    "science sangrah",
+    "gyan sindhu",
+    "doubtnut",
+    "utkarsh",
+    # Class 12 CBSE PCM Board Specialists
+    "bharat panchal",
+    "chemistry guruji",
+    "sourabh raina",
+    "arvind academy",
+    "munil sir",
+    "abhishek sahu",
+    "science and fun",
+    "ashu ghai",
+    "learnohub",
+    "magnet brains",
+    "radhika classes",
+    "next toppers",
 )
 
 ADVANCED_FACULTY_CHANNELS = (
@@ -927,14 +1291,16 @@ ENGLISH_MEDIUM_CUES = (
     "vinay uppal",
     "physics sir jee",
     "indian school of physics",
+    "simplifiedminds",
+    "simplified minds",
 )
 
-# Strict Rejections: NEET-only, Class 8/9/10, Regional-only non-English/Hindi, Non-academic noise
+# Strict Rejections: NEET-only biology, Class 6/7/8/9/10, SSC/Railway/UPSC, and non-academic noise
 HARD_REJECT_RE = re.compile(
     r"\b(neet\s+only|only\s+for\s+neet|neet\s+biology|botany|zoology|mbbs|aiims\s+biology|"
-    r"neet\s+ug|complete\s+neet|mission\s+neet|yakeen|aarambh\s+neet|neet\s+202\d|"
-    r"class\s*(?:6|7|8|9|10|ix|x)\b|icse|ssc\s+cgl|upsc|tgt|pgt|dsssb|kvs|cuet\s+only|kcet|mht\s*cet|"
-    r"vaathi|tamil|telugu|malayalam|kannada|bangla|bengali|marathi|gujarati|odia|"
+    r"complete\s+neet|mission\s+neet|yakeen|aarambh\s+neet|"
+    r"class\s*(?:6|7|8|9|10|ix|x)(?:th)?\b|(?:6th|7th|8th|9th|10th)\s*(?:class|std|standard|boards?)\b|sslc|icse|"
+    r"ssc\s*(?:cgl|chsl|gd|mts)?|railway|rrb\s+ntpc|upsc|tgt|pgt|dsssb|kvs|"
     r"vlog|prank|controversy|exposed|roast|reaction\s+video|cutoff|marks\s+vs\s+percentile|"
     r"college\s+review|hostel\s+tour|josaa|counselling|time\s*table|how\s+to\s+crack|"
     r"paper\s+solutions?|paper\s+discussion|question\s+paper\s+solutions?|video\s+solutions|answer\s+key|memory\s+based|"
@@ -1260,9 +1626,20 @@ def is_om_sharma_candidate(cand: dict) -> bool:
 
 def is_verified_jee_channel(channel: str) -> bool:
     low = channel.casefold()
-    # Reject NEET-only institute channels (e.g. ALLEN NEET, Sri Chaitanya Academy NEET, Aakash NEET)
-    # while allowing multi-exam channels whose name explicitly includes JEE/IIT (e.g. eSaral - JEE, NEET...).
-    if re.search(r"\bneet\b", low) and not re.search(r"\b(jee|iit)\b", low):
+    # Reject Commerce, Arts, Humanities & Class 6-10 channels
+    if re.search(r"\b(commerce|arts|humanities)\b", low):
+        return False
+    if re.search(r"\b(class\s*[6789]|class\s*10)\b", low) and not re.search(
+        r"\b(jee|iit|cet|11|12|plus\s*two|puc)\b",
+        low,
+    ):
+        return False
+    # Reject NEET-only institute channels (e.g. ALLEN NEET, Sri Chaitanya Academy NEET, Xylem NEET)
+    # while allowing multi-exam channels that explicitly include JEE or Engineering CETs.
+    if re.search(r"\bneet\b", low) and not re.search(
+        r"\b(jee|iit|cet|kcet|mht|eamcet|eapcet|wbjee|keam|gujcet)\b",
+        low,
+    ):
         return False
     return any(p in low for p in VERIFIED_CHANNEL_PATTERNS)
 
@@ -1297,11 +1674,26 @@ def resolve_institute(cand: dict) -> str:
         return "Unacademy"
     if "mohit tyagi" in ch_low or "competishun" in ch_low:
         return "Competishun (Mohit Tyagi)"
-    if any(k in ch_low for k in ("jee wallah", "physics wallah", "lakshya jee", "arjuna jee", "jee challengers", "pw jee")):
+    if any(
+        k in ch_low
+        for k in (
+            "jee wallah",
+            "physics wallah",
+            "lakshya jee",
+            "arjuna jee",
+            "jee challengers",
+            "pw ",
+            "ncert wallah",
+            "cbse wallah",
+            "mht cet wallah",
+            "punjab wallah",
+            "vijeta",
+        )
+    ):
         return "Physics Wallah (PW)"
     if "physics galaxy" in ch_low or "eduniti" in ch_low:
         return "Physics Galaxy & Eduniti"
-    if "vedantu" in ch_low:
+    if "vedantu" in ch_low or "v maharashtra" in ch_low:
         return "Vedantu JEE"
     if "vmc" in ch_low or "vidyamandir" in ch_low:
         return "VMC (Vidyamandir)"
@@ -1331,8 +1723,76 @@ def resolve_institute(cand: dict) -> str:
         )
     ) or "atp star" in blob:
         return "Motion, Etoos & Kota Institutes"
-    if "vora classes" in ch_low or "mathongo" in ch_low or "jeeongo" in ch_low:
+    if any(k in ch_low for k in ("vora classes", "mathongo", "jeeongo", "phodu club")):
         return "Vora Classes & MathonGo"
+    if any(k in ch_low for k in ("xylem", "eduport", "exam winner", "brilliant pala")):
+        return "Xylem, Brilliant Pala & Kerala"
+    if any(
+        k in ch_low
+        for k in (
+            "dinesh sir",
+            "physics gyan",
+            "physics gyaan",
+            "mukesh nayak",
+            "sovind sir",
+            "all about chemistry",
+            "sahyadri tutorials",
+            "new indian era",
+            "pawan wagh",
+            "giri tutorials",
+            "simplifiedminds",
+            "simplified minds",
+            "educare karnataka",
+            "educare light for life",
+            "parikshe",
+            "deeksha karnataka",
+            "bongmistry",
+            "soe bangla",
+            "science beta",
+            "vidyakul",
+            "youth education",
+            "diwalipura",
+            "nimeshsir",
+            "nimesh sir",
+            "priyeshsir",
+            "chse catalyst",
+            "matsci odia",
+            "matsci science",
+            "rkd classes",
+            "dear ramesh",
+            "hundred learning",
+            "alexmaths",
+            "alex maths",
+            "ajay jummidi",
+            "kiran sir",
+            "pseb",
+        )
+    ):
+        return "State CET & Regional Educators"
+    if any(
+        k in ch_low
+        for k in (
+            "bharat panchal",
+            "chemistry guruji",
+            "sourabh raina",
+            "arvind academy",
+            "munil sir",
+            "abhishek sahu",
+            "science and fun",
+            "ashu ghai",
+            "learnohub",
+            "magnet brains",
+            "radhika classes",
+            "next toppers",
+            "ashish singh",
+            "learn and share",
+            "science sangrah",
+            "gyan sindhu",
+            "doubtnut",
+            "utkarsh",
+        )
+    ):
+        return "CBSE & Hindi Medium Educators"
     return "Independent JEE Specialists"
 
 
@@ -1359,6 +1819,79 @@ def resolve_educator(cand: dict, subject: str, unit: str) -> str:
 
     if subject == "Mathematics" and is_om_sharma_candidate(cand):
         return "Om Sharma Sir (Uplift Maths)"
+
+    # Keep regional PW / Vedantu / Unacademy / Xylem channels distinct so edu_cap treats each language channel independently
+    if any(
+        rk in ch_low
+        for rk in (
+            "pw telugu",
+            "pw telangana",
+            "pw andhra",
+            "physics wallah telugu",
+            "vedantu telugu",
+            "unacademy telugu",
+            "pw tamil",
+            "physics wallah tamil",
+            "vedantu master tamil",
+            "vedantu jee vaathi",
+            "pw malayalam",
+            "physics wallah malayalam",
+            "xylem",
+            "eduport",
+            "exam winner",
+            "brilliant pala",
+            "pw kannada",
+            "pw kcet",
+            "physics wallah kannada",
+            "simplifiedminds",
+            "simplified minds",
+            "educare karnataka",
+            "educare light for life",
+            "parikshe",
+            "vedantu karnataka",
+            "pw maharashtra",
+            "pw mht cet",
+            "v maharashtra",
+            "physics wallah maharashtra",
+            "mht cet wallah",
+            "pw bangla",
+            "pw wbjee",
+            "physics wallah bangla",
+            "unacademy bangla",
+            "bongmistry",
+            "soe bangla",
+            "science beta",
+            "pw gujarati",
+            "pw gujarat",
+            "physics wallah gujarati",
+            "vidyakul",
+            "youth education",
+            "diwalipura",
+            "nimeshsir",
+            "nimesh sir",
+            "priyeshsir",
+            "pw odia",
+            "pw odisha",
+            "physics wallah odia",
+            "chse catalyst",
+            "matsci odia",
+            "matsci science",
+            "rkd classes",
+            "pw punjabi",
+            "pw punjab",
+            "physics wallah punjabi",
+            "punjab wallah",
+            "pw hindi",
+            "physics wallah hindi",
+            "pw class 11 & 12 - english",
+            "ncert wallah",
+            "cbse wallah",
+        )
+    ):
+        return cand["channel"]
+
+    if "dinesh sir" in ch_low:
+        return "Dinesh Sir (MHT-CET)"
 
     teacher_rules = [
         (r"\bnishant vora\b|\bnv\s*sir\b", "Nishant Vora (NV Sir)" if "motion" not in ch_low else "NV Sir (Motion Kota)"),
@@ -1416,6 +1949,22 @@ def resolve_educator(cand: dict, subject: str, unit: str) -> str:
         (r"acadza|\banshul\s*sir\b", "Anshul Singhal (Acadza)"),
         (r"ms chouhan", "M.S. Chouhan Sir"),
         (r"jee challengers", "JEE Challengers (PW)"),
+        (r"bharat panchal|chemistry guruji", "Bharat Panchal Sir"),
+        (r"sourabh raina", "Sourabh Raina Sir"),
+        (r"arvind academy", "Arvind Academy"),
+        (r"munil sir", "Munil Sir"),
+        (r"abhishek sahu", "Abhishek Sahu Sir"),
+        (r"science and fun|ashu ghai", "Ashu Ghai (Science & Fun)"),
+        (r"radhika classes", "Radhika Classes"),
+        (r"physics gya+n|mukesh nayak", "Mukesh Nayak (Physics Gyan)"),
+        (r"sovind sir|all about chemistry", "Sovind Sir (Chemistry)"),
+        (r"sahyadri tutorials", "Sahyadri Tutorials"),
+        (r"new indian era", "New Indian Era"),
+        (r"pawan wagh", "Pawan Wagh Academy"),
+        (r"giri tutorials", "Giri Tutorials"),
+        (r"ashish singh lectures", "Ashish Singh Lectures"),
+        (r"learn and share", "Learn and Share"),
+        (r"science sangrah", "Science Sangrah"),
     ]
     for pat, label in teacher_rules:
         if re.search(pat, blob):
@@ -1425,16 +1974,110 @@ def resolve_educator(cand: dict, subject: str, unit: str) -> str:
 
 
 def resolve_language(cand: dict) -> str:
-    blob = f"{cand['title']} {cand['channel']}".lower()
+    title = cand.get("title") or ""
+    channel = cand.get("channel") or ""
+    ch_low = channel.lower()
+    blob = f"{title} {channel}".lower()
+
+    # 1. Telugu
+    if re.search(
+        r"\btelugu\b|తెలుగు|[\u0C00-\u0C7F]|\beapcet\b|\bts\s*eamcet\b|\bap\s*eamcet\b|"
+        r"vedantu\s*telugu|pw\s*telugu|pw\s*telangana|pw\s*andhra|physics\s*wallah\s*telugu|unacademy\s*telugu",
+        blob,
+    ) or re.search(r"ajay\s*jummidi|kiran\s*sir", ch_low):
+        return "Telugu"
+
+    # 2. Tamil (checked before Malayalam so 'xylem ... tamil' resolves to Tamil)
+    if re.search(
+        r"\btamil\b|தமிழ்|[\u0B80-\u0BFF]|\bvaathi\b|vedantu\s*master\s*tamil|pw\s*tamil|"
+        r"physics\s*wallah\s*tamil|xylem.*tamil|hundred\s*learning|alex\s*maths|alexmaths",
+        blob,
+    ):
+        return "Tamil"
+
+    # 3. Malayalam
+    if re.search(
+        r"\bmalayalam\b|മലയാളം|[\u0D00-\u0D7F]|xylem\s*jee|xylem\s*plus|xylem\s*learning|xylem\s*keam|"
+        r"eduport|exam\s*winner|brilliant\s*pala|keam.*malayalam|pw\s*malayalam|physics\s*wallah\s*malayalam",
+        blob,
+    ):
+        return "Malayalam"
+
+    # 4. Kannada
+    if re.search(
+        r"\bkannada\b|ಕನ್ನಡ|[\u0C80-\u0CFF]|educare\s*karnataka|educare\s*light\s*for\s*life|pw\s*kannada|pw\s*kcet|"
+        r"physics\s*wallah\s*kannada|\bparikshe\b|kcet.*kannada|vedantu\s*karnataka|deeksha\s*karnataka",
+        blob,
+    ) or (
+        re.search(r"simplified\s*minds|simplifiedminds", blob)
+        and not re.search(r"\bin english\b|\benglish medium\b", blob)
+    ):
+        return "Kannada"
+
+    # 5. Marathi (checked before Hindi so Devanagari Marathi titles/channels resolve to Marathi;
+    #    educator-name cues checked on ch_low so ALLEN Kota's Dinesh Sir stays Hinglish!)
+    if re.search(
+        r"\bmarathi\b|मराठी|pw\s*maharashtra|pw\s*mht\s*cet|v\s*maharashtra|physics\s*wallah\s*maharashtra|mht\s*cet\s*wallah",
+        blob,
+    ) or re.search(
+        r"dinesh\s*sir|physics\s*gya+n|mukesh\s*nayak|sovind\s*sir|all\s*about\s*chemistry|"
+        r"sahyadri\s*tutorials|new\s*indian\s*era|pawan\s*wagh|giri\s*tutorials",
+        ch_low,
+    ):
+        return "Marathi"
+
+    # 6. Bengali
+    if re.search(
+        r"\bbangla\b|\bbengali\b|বাংলা|[\u0980-\u09FF]|pw\s*bangla|pw\s*wbjee|physics\s*wallah\s*bangla|"
+        r"soe\s*bangla|bongmistry|science\s*beta|unacademy\s*bangla|wbjee.*bangla",
+        blob,
+    ):
+        return "Bengali"
+
+    # 7. Gujarati
+    if re.search(
+        r"\bgujarati\b|ગુજરાતી|[\u0A80-\u0AFF]|pw\s*gujarati|pw\s*gujarat|gshseb|physics\s*wallah\s*gujarati|"
+        r"vidyakul\s*gujarati|youth\s*vidyakul|youth\s*education|diwalipura|nimesh\s*sir|nimeshsir|priyeshsir|gujcet.*gujarati",
+        blob,
+    ):
+        return "Gujarati"
+
+    # 8. Odia
+    if re.search(
+        r"\bodia\b|ଓଡ଼ିଆ|[\u0B00-\u0B7F]|pw\s*odia|pw\s*odisha|chse\s*odisha|odisha\s*board|"
+        r"physics\s*wallah\s*odia|chse\s*catalyst|matsci\s*odia|matsci\s*science|rkd\s*classes|dear\s*ramesh",
+        blob,
+    ):
+        return "Odia"
+
+    # 9. Punjabi
+    if re.search(
+        r"\bpunjabi\b|ਪੰਜਾਬੀ|[\u0A00-\u0A7F]|pw\s*punjabi|pw\s*punjab|punjab\s*board|physics\s*wallah\s*punjabi|punjab\s*wallah|\bpseb\b",
+        blob,
+    ):
+        return "Punjabi"
+
+    # 10. Hindi Medium (explicit Hindi Medium cues or Devanagari script in title without Marathi cues)
+    if re.search(
+        r"hindi\s*medium|हिंदी\s*माध्यम|pw\s*hindi\s*medium|pw\s*hindi|physics\s*wallah\s*hindi|"
+        r"ashish\s*singh\s*lectures|learn\s*and\s*share|science\s*sangrah|gyan\s*sindhu|utkarsh\s*online|doubtnut.*hindi",
+        blob,
+    ) or re.search(r"[\u0900-\u097F]", title):
+        return "Hindi"
+
+    # 11. English
     if any(cue in blob for cue in ENGLISH_MEDIUM_CUES) or re.search(r"\bin english\b|\benglish medium\b", blob):
         if not re.search(r"\bhindi\b|\bmanzil\b|\bprayas\b|\barjuna\b|\blakshya\b", blob):
             return "English"
+
+    # 12. Hinglish (default pan-India Hindi+English teaching)
     return "Hinglish"
 
 
 def classify_exam_and_format(cand: dict) -> tuple[str, str]:
     title_low = cand["title"].lower()
     ch_low = cand["channel"].lower()
+    blob_low = f"{title_low} {ch_low}"
 
     if cand["provider"] == "playlist":
         fmt = "Full Course"
@@ -1461,7 +2104,79 @@ def classify_exam_and_format(cand: dict) -> tuple[str, str]:
 
     has_adv = bool(re.search(r"\b(jee\s*adv\w*|advanced|olympiad|irodov|pathfinder|black\s*book|sbt)\b", title_low))
     has_iit = bool(re.search(r"\biit[\s-]*jee\b", title_low))
+    has_jee_title = bool(re.search(r"\b(jee|iit)\b", title_low))
     has_main = bool(re.search(r"\b(jee\s*mains?|mains?\s*202\d|manzil|bounce\s*back|jee\s*brief|checklist|ncert)\b", title_low))
+
+    has_cet = bool(
+        re.search(
+            r"\b(mht[\s-]*cet|kcet|eamcet|eapcet|wbjee|keam|gujcet|ojee|comedk|bitsat|viteee)\b",
+            blob_low,
+        )
+        or any(
+            c in ch_low
+            for c in (
+                "sahyadri tutorials",
+                "mht cet wallah",
+                "pw kcet",
+                "pw mht cet",
+                "pw wbjee",
+                "phodu club",
+            )
+        )
+    )
+    has_board_cue = bool(
+        re.search(
+            r"\b(cbse|board\s*exams?|boards?\s*202\d|class\s*12(?:th)?\s*boards?|std\s*12|hsc|(?:1st|2nd)\s*pu(?:c)?|puc\s*[12]|plus\s*two|ipe|wbchse|chse|odisha\s*board|gseb|gshseb|up\s*board|bihar\s*board|pseb|punjab\s*board|ncert\s*one\s*shot)\b",
+            blob_low,
+        )
+    )
+    is_board_channel = any(
+        c in ch_low
+        for c in (
+            "bharat panchal",
+            "chemistry guruji",
+            "sourabh raina",
+            "arvind academy",
+            "munil sir",
+            "abhishek sahu",
+            "science and fun",
+            "ashu ghai",
+            "ncert wallah",
+            "cbse wallah",
+            "vijeta",
+            "radhika classes",
+            "learnohub",
+            "magnet brains",
+            "next toppers",
+            "ashish singh lectures",
+            "learn and share",
+            "science sangrah",
+            "gyan sindhu",
+            "new indian era",
+            "pawan wagh",
+            "giri tutorials",
+            "exam winner",
+            "eduport",
+            "educare karnataka",
+            "educare light for life",
+            "simplifiedminds karnataka",
+            "parikshe",
+            "pw odisha",
+            "chse catalyst",
+            "matsci odia",
+            "matsci science",
+            "rkd classes",
+            "pw gujarat",
+            "vidyakul",
+            "youth education",
+            "diwalipura",
+            "nimeshsir",
+            "pw punjab",
+            "hundred learning",
+            "alexmaths",
+            "alex maths",
+        )
+    )
 
     if fmt == "Adv Problems" or any(
         c in ch_low
@@ -1478,6 +2193,10 @@ def classify_exam_and_format(cand: dict) -> tuple[str, str]:
         )
     ):
         exam = "JEE Advanced" if not has_main else "JEE Main + Advanced"
+    elif has_cet and not has_adv:
+        exam = "State CETs & BITSAT"
+    elif (has_board_cue or is_board_channel) and not has_jee_title and not has_cet:
+        exam = "Class 12 & Boards"
     elif has_adv and not has_main:
         exam = "JEE Advanced"
     elif has_iit and not has_main and is_advanced_channel(ch_low):
@@ -1504,7 +2223,7 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     channel = cand["channel"]
     ch_low = channel.casefold()
 
-    # 1. Must belong to our Verified IIT-JEE Educator / Official Institute Channel allowlist
+    # 1. Must belong to our Verified IIT-JEE / CET / Class 12 PCM Educator & Channel allowlist
     #    (Let's Crack Olympiads! is an official Unacademy channel hosting Om Sharma Sir's full IIT-JEE Maths courses)
     is_om_on_lco = (
         subject == "Mathematics"
@@ -1514,53 +2233,86 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     if not (is_verified_jee_channel(channel) or is_om_on_lco):
         return False
 
-    # 2. Reject NEET-only, Class 8/9/10, Regional non-English/Hindi, and non-lecture noise (evaluated on title)
+    # 2. Reject NEET-only biology, Class 6-10, SSC/Railway/UPSC, and non-lecture noise (evaluated on title)
     if HARD_REJECT_RE.search(title):
         return False
-    if re.search(r"\bneet\b", title, re.I) and not re.search(r"\b(jee|iit)\b", title, re.I):
+    if re.search(r"\bneet\b", title, re.I) and not re.search(
+        r"\b(jee|iit|cet|mht|kcet|eamcet|eapcet|wbjee|keam|gujcet|ojee|comedk|bitsat|viteee|cbse|boards?|hsc|puc|plus\s*two|wbchse|chse|gseb|gshseb)\b",
+        title,
+        re.I,
+    ):
         return False
 
     # Gateway course playlists explicitly mapped to their opening Mathematics chapter
     if cand["provider"] == "playlist" and cand["video_id"] in OM_SHARMA_GATEWAY_PLAYLISTS:
         return OM_SHARMA_GATEWAY_PLAYLISTS[cand["video_id"]] == ch_no
 
-    # 3. Prevent cross-chapter collisions on shared umbrella terms
+    # 3. Prevent cross-chapter collisions on shared umbrella terms (English + Hindi)
     if ch_no == 1 and re.search(r"\blet\s+[a-z]\s+be\s+the\s+set\b", title, re.I):
         return False
     if ch_no == 2 and re.search(
-        r"\b(functional equations?|greatest integer|inverse trigonometr\w*|\bitf\b|continuity|differentiabil\w*|limits?\b|logarithm\w*)\b",
+        r"\b(functional equations?|greatest integer|trigonometr\w*|inverse trigonometr\w*|\bitf\b|continuity|differentiabil\w*|limits?\b|logarithm\w*)\b",
         title,
         re.I,
     ):
         return False
+    if ch_no == 10 and re.search(r"\b(inverse trigonometr\w*|\bitf\b)\b|प्रतिलोम", title, re.I):
+        return False
     if ch_no == 13 and re.search(r"\b(3\s*-?\s*d|three\s+dimension)", title, re.I):
+        return False
+    if ch_no == 14 and "दीर्घवृत्त" in title:
+        return False
+    if ch_no == 15 and "अतिपरवलय" in title:
         return False
     if ch_no == 28 and (
         (re.search(r"\bvector\s*[-&]\s*3d\b", title, re.I) and not re.search(r"\b3d[\s-]*geometry\b", title, re.I))
         or re.search(r"\bstatistics\b", title, re.I)
     ):
         return False
-    if ch_no == 43 and re.search(r"\bcapacit", title, re.I) and not re.search(r"\b(charges|coulomb|gauss)", title, re.I):
+    if ch_no == 43 and re.search(r"\bcapacit|संधारित्र|धारिता", title, re.I) and not re.search(r"\b(charges|coulomb|gauss)|आवेश", title, re.I):
         return False
     # Prevent Ch 46 (Moving Charges) from consuming pure "Magnetism and Matter"
-    if ch_no == 46 and re.search(r"\bmagnetism\s*(?:and|&)\s*matter\b", title, re.I):
+    if ch_no == 46 and re.search(r"\bmagnetism\s*(?:and|&)\s*matter\b|चुंबकत्व\s*(?:एवं|और)\s*द्रव्य", title, re.I):
         return False
-    if ch_no == 47 and re.search(r"\bmoving charges\b", title, re.I) and not re.search(r"\bmatter\b", title, re.I):
+    if ch_no == 47 and re.search(r"\bmoving charges\b|गतिमान आवेश", title, re.I) and not re.search(r"\bmatter\b|द्रव्य", title, re.I):
         return False
-    # Prevent Ch 20 (MOD) from stealing "Application of Derivatives" (Ch 21)
-    if ch_no == 20 and re.search(r"\bapplications? of derivatives?\b|\baod\b|\bmaxima\b|\bminima\b|\bmonotonicity\b|\btangent\b", title, re.I):
+    if ch_no == 50 and re.search(r"\bwave\s+optics\b|तरंग प्रकाशिकी", title, re.I) and not re.search(r"\bray\s+optics\b|किरण", title, re.I):
         return False
-    # Prevent Ch 22/23 disambiguation
-    if ch_no == 22 and re.search(r"\bdefinite integration\b", title, re.I) and not re.search(r"\bindefinite\b", title, re.I):
-        return False
-    if ch_no == 23 and re.search(r"\bindefinite integration\b", title, re.I) and not re.search(r"\bdefinite\b", title, re.I):
-        return False
-    # Prevent Ch 62 (Liquid Solutions) from matching generic exam/paper "Solutions"
-    if ch_no == 62 and not re.search(
-        r"\b(liquid|dilute|colligative|raoult|van'?t\s*hoff|one[\s-]*shot|1[\s-]*shot|full\s+chapter|class\s*12|chemistry|parmanu|bounce\s*back)\b",
+    # Prevent Ch 20 (MOD) from stealing "Application of Derivatives" (Ch 21) or "Differential Equations" (Ch 25)
+    if ch_no == 20 and re.search(
+        r"\bapplications? of derivatives?\b|\baod\b|\bmaxima\b|\bminima\b|\bmonotonicity\b|\btangent\b|अवकलज के अनुप्रयोग|अवकल समीकरण",
         title,
         re.I,
     ):
+        return False
+    # Prevent Ch 22/23/24 disambiguation
+    if ch_no == 22 and (
+        re.search(
+            r"\bdefinite\s+integr\w*\b|निश्चित\s+समाकलन|\bapplications?\s+of\s+integr\w*\b|\barea\s+under\b|समाकलनों?\s+के\s+अनुप्रयोग",
+            title,
+            re.I,
+        )
+        and not re.search(r"\bindefinite\b|अनिश्चित", title, re.I)
+    ):
+        return False
+    if ch_no == 23 and re.search(r"\bindefinite integration\b|अनिश्चित समाकलन", title, re.I) and not re.search(r"\bdefinite\b|निश्चित", title, re.I):
+        return False
+    # Prevent Ch 62 (Liquid Solutions) from matching generic exam/exercise "Solutions"
+    if ch_no == 62:
+        if re.search(
+            r"\b(?:ncert|paper|set|sample|model|test|dpp|sheet|module|exercise|pyq|question)s?\s+solutions?\b|\bsolutions?\s+(?:of|to|for)\b",
+            title,
+            re.I,
+        ):
+            return False
+        if not re.search(
+            r"\b(liquid|dilute|colligative|raoult|van'?t\s*hoff|one[\s-]*shot|1[\s-]*shot|full\s+chapter|complete|class\s*12|std\s*12|plus\s*two|2nd\s*puc|hsc|mht|kcet|eamcet|eapcet|wbjee|keam|gujcet|cbse|boards?|chemistry|parmanu|bounce\s*back)\b|विलयन|रसायन|દ્રાવણો",
+            title,
+            re.I,
+        ):
+            return False
+    # Prevent Ch 80 (Chemistry Biomolecules) from matching Class 11 Biology Biomolecules
+    if ch_no == 80 and re.search(r"\b(class\s*11|plus\s*one|1st\s*puc|biology|botany|zoology)\b|जीव\s*विज्ञान", title, re.I) and not re.search(r"\b(chemistry|organic)\b|रसायन", title, re.I):
         return False
 
     # 4. Reject full-subject megacompilations ("all chapters", "in order") unless chapter title matches
@@ -1580,26 +2332,54 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     # 7. Cross-Subject Guards (checks hashtag-stripped title & teacher cues without blocking "Physics Wallah" channel on Maths/Chem!)
     title_clean = re.sub(r"#\w+", "", title)
     blob_tc = f"{title_clean} {channel}"
+    # Reject Biology, Commerce & Humanities subjects across all PCM chapters
+    if re.search(
+        r"\b(biology|botany|zoology|economics|accountancy|commerce|business\s+studies|history|civics|geography|political\s+science|computer|english\s+core|flamingo|vistas)\b|जीव\s*विज्ञान",
+        title_clean,
+        re.I,
+    ):
+        return False
+
     if subject == "Mathematics":
         if re.search(
-            r"\b(abj sir|physics galaxy|eduniti|rohit mishra|saleem sir|rajwant sir|alk sir|ns sir|sakshi|dexterchem|kinematics|electrostatics|mole concept|organic chemistry)\b",
+            r"\b(abj sir|physics galaxy|eduniti|rohit mishra|saleem sir|rajwant sir|alk sir|ns sir|sakshi|dexterchem|bharat panchal|chemistry guruji|sourabh raina|bongmistry|sovind sir|munil sir|abhishek sahu|radhika classes|physics gya+n|kinematics|electrostatics|mole concept|organic chemistry)\b",
             blob_tc,
             re.I,
-        ) or re.search(r"\b(jee\s+physics|class\s*1[12]\s*physics|jee\s+chemistry)\b", title_clean, re.I):
+        ) or re.search(
+            r"\b(physics(?!\s+wallah)|chemistry)\b|भौतिक\s*विज्ञान|भौतिकी|रसायन\s*विज्ञान",
+            title_clean,
+            re.I,
+        ):
             return False
     elif subject == "Physics":
-        if re.search(
-            r"\b(alk sir|ns sir|akk sir|skm sir|sakshi|pankaj sir|faisal|dexterchem|om pandey|sachin rana|mathsmerizing|mathongo|nishant vora|mole concept|enthalpy|gibbs|chemical thermodynamics|chemical kinetics|gaseous state)\b",
-            blob_tc,
-            re.I,
-        ) or re.search(r"\b(chemistry|class\s*1[12]\s*maths|jee\s+mathematics)\b", title_clean, re.I):
+        if (
+            re.search(
+                r"\b(alk sir|ns sir|akk sir|skm sir|sakshi|pankaj sir|faisal|dexterchem|om pandey|sachin rana|bharat panchal|chemistry guruji|sourabh raina|bongmistry|sovind sir|mathsmerizing|mathongo|nishant vora|mole concept|enthalpy|gibbs|chemical thermodynamics|chemical kinetics|gaseous state)\b",
+                blob_tc,
+                re.I,
+            )
+            or "dinesh sir" in ch_low
+            or re.search(
+                r"\b(chemistry|maths|mathematics)\b|रसायन\s*विज्ञान|गणित",
+                title_clean,
+                re.I,
+            )
+        ):
             return False
     elif subject == "Chemistry":
-        if re.search(
-            r"\b(abj sir|physics galaxy|saleem sir|rajwant|eduniti|rohit mishra|vinay uppal|mathsmerizing|nishant vora|mathongo|kinematics|rotational|carnot|photoelectric|x[- ]?rays|modern physics|nuclear physics)\b",
-            blob_tc,
-            re.I,
-        ) or re.search(r"\b(jee\s+physics|class\s*1[12]\s*physics|jee\s+maths)\b", title_clean, re.I):
+        if (
+            re.search(
+                r"\b(abj sir|physics galaxy|saleem sir|rajwant|eduniti|rohit mishra|vinay uppal|munil sir|abhishek sahu|radhika classes|physics gya+n|mathsmerizing|nishant vora|mathongo|kinematics|rotational|carnot|photoelectric|x[- ]?rays|modern physics|nuclear physics)\b",
+                blob_tc,
+                re.I,
+            )
+            or "dinesh sir" in ch_low
+            or re.search(
+                r"\b(physics(?!\s+wallah)|maths|mathematics)\b|भौतिक\s*विज्ञान|भौतिकी|गणित",
+                title_clean,
+                re.I,
+            )
+        ):
             return False
 
     # 8. Duration & Lesson Count Floor
@@ -1693,7 +2473,9 @@ def build_corpus(use_cache: bool = True) -> dict:
     chapter_tasks = []
     for row in SYLLABUS:
         ch_no, subject, unit, class_lvl, weightage, scope, ch_name, pat, core_q, alt_q = row
-        cre = re.compile(pat, re.I)
+        alias = BILINGUAL_CHAPTER_ALIASES.get(ch_no)
+        full_pat = f"(?:{pat})|(?:{alias})" if alias else pat
+        cre = re.compile(full_pat, re.I)
         compiled_chapters.append((ch_no, subject, unit, class_lvl, weightage, scope, ch_name, cre))
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} IIT JEE", SP_PLAYLIST_ONLY))
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{alt_q} JEE", SP_PLAYLIST_ONLY))
@@ -1741,10 +2523,12 @@ def build_corpus(use_cache: bool = True) -> dict:
                 for c in items:
                     sweep_candidates.append((subject, c))
 
-    # Route teacher-sweep playlists into matching chapters (check specialized chapters first so Ch 26/19/21/29 beat umbrella chapters)
+    # Route sweep candidates into matching chapters (check specialized chapters first so Ch 26/19/21/23/24/51 beat umbrella chapters)
+    tier0 = {26, 11, 12, 16, 17, 19, 21, 23, 24, 28, 29, 44, 47, 51, 56, 61, 73}
+    tier1 = {22, 60, 72}
     priority_chapters = sorted(
         compiled_chapters,
-        key=lambda c: (0 if c[0] in {26, 11, 12, 19, 21, 28, 29, 44, 47, 56, 61, 73} else 1, c[0]),
+        key=lambda c: (0 if c[0] in tier0 else (1 if c[0] in tier1 else 2), c[0]),
     )
     for subj, cand in sweep_candidates:
         for ch_no, c_subj, _, _, _, _, _, cre in priority_chapters:
@@ -1752,15 +2536,13 @@ def build_corpus(use_cache: bool = True) -> dict:
                 raw_results[ch_no].append(cand)
                 break
 
-    # Process specialized chapters first when claiming global deduplication keys so Ch 02/20 never steal Ch 26/19/21's playlist
-    processing_order = sorted(
-        compiled_chapters,
-        key=lambda c: (0 if c[0] in {26, 11, 12, 19, 21, 22, 23, 24, 28, 29, 44, 47, 56, 60, 61, 72, 73} else 1, c[0]),
-    )
+    # Process specialized chapters first when claiming global deduplication keys so Ch 02/20/22 never steal Ch 26/19/21/23/24's playlist
+    processing_order = priority_chapters
 
     seen_global: set[tuple[str, str]] = set()
     chapter_records_map: dict[int, list[dict]] = {}
     chapter_meta_map: dict[int, dict] = {}
+    max_per_chapter = 40
 
     for ch_no, subject, unit, class_lvl, weightage, scope, ch_name, _ in processing_order:
         candidates = raw_results[ch_no]
@@ -1852,7 +2634,6 @@ def build_corpus(use_cache: bool = True) -> dict:
                 x
                 for x in (playlists_pool + videos_pool)
                 if is_om_sharma_candidate(x[6])
-                and (x[6]["provider"] == "playlist" or x[6].get("duration_sec", 0) >= 3600 or len([y for y in videos_pool if is_om_sharma_candidate(y[6])]) <= 2)
             ]
             if om_pool:
                 _try_take(om_pool, len(unique_ch) + 5, 3)
@@ -1869,7 +2650,44 @@ def build_corpus(use_cache: bool = True) -> dict:
         if specialist_pool:
             _try_take(specialist_pool, len(unique_ch) + 6, 2)
 
-        # Sort strictly by pure YouTube trend_score (velocity + views + recency) — zero institute bias
+        # Multi-Language & Exam Stream Representation Pass:
+        # Ensure regional Indian languages and State CETs & BITSAT / Class 12 & Boards present in this
+        # chapter's enriched pool are not squeezed out by the Hinglish JEE cap (up to ~40 items/chapter).
+        combined_by_trend = sorted(
+            videos_pool + playlists_pool,
+            key=lambda x: (-x[0], -x[6]["view_count"], -x[6]["lesson_count"]),
+        )
+        for rep_lang in (
+            "Telugu",
+            "Tamil",
+            "Malayalam",
+            "Kannada",
+            "Marathi",
+            "Bengali",
+            "Gujarati",
+            "Odia",
+            "Punjabi",
+            "Hindi",
+            "English",
+        ):
+            if len(unique_ch) >= max_per_chapter:
+                break
+            cur_lang_cnt = sum(1 for r in unique_ch if r["language"] == rep_lang)
+            if cur_lang_cnt < 2:
+                lang_pool = [x for x in combined_by_trend if resolve_language(x[6]) == rep_lang]
+                if lang_pool:
+                    _try_take(lang_pool, min(max_per_chapter, len(unique_ch) + (2 - cur_lang_cnt)), 2)
+
+        for rep_exam in ("State CETs & BITSAT", "Class 12 & Boards"):
+            if len(unique_ch) >= max_per_chapter:
+                break
+            cur_exam_cnt = sum(1 for r in unique_ch if r["target_exam"] == rep_exam)
+            if cur_exam_cnt < 2:
+                exam_pool = [x for x in combined_by_trend if x[4] == rep_exam]
+                if exam_pool:
+                    _try_take(exam_pool, min(max_per_chapter, len(unique_ch) + (2 - cur_exam_cnt)), 2)
+
+        # Sort strictly by pure YouTube trend_score (velocity + views + recency) — zero institute/language bias
         unique_ch.sort(
             key=lambda r: (
                 -r["trend_score"],
@@ -1878,6 +2696,11 @@ def build_corpus(use_cache: bool = True) -> dict:
                 -r["lesson_count"],
             )
         )
+        for i in range(len(unique_ch) - 1):
+            assert unique_ch[i]["trend_score"] >= unique_ch[i + 1]["trend_score"], (
+                f"Trend monotonicity violated in Ch {ch_no}: "
+                f"{unique_ch[i]['trend_score']} < {unique_ch[i + 1]['trend_score']}"
+            )
         pl_cnt = sum(1 for r in unique_ch if r["provider"] == "playlist")
 
         yt_pl_q = urllib.parse.quote_plus(f"{ch_name} IIT JEE")
@@ -1899,11 +2722,16 @@ def build_corpus(use_cache: bool = True) -> dict:
             "yt_oneshots_url": f"https://www.youtube.com/results?search_query={yt_os_q}&sp=EgIYAg%253D%253D",
         }
 
-    # Assemble in canonical syllabus order 1..80
+    # Assemble in canonical syllabus order 1..80 & assert pure trend monotonicity per chapter
     syllabus_out = [chapter_meta_map[n] for n in range(1, len(SYLLABUS) + 1)]
     all_entries: list[dict] = []
     for n in range(1, len(SYLLABUS) + 1):
-        all_entries.extend(chapter_records_map[n])
+        ch_items = chapter_records_map[n]
+        assert all(
+            ch_items[i]["trend_score"] >= ch_items[i + 1]["trend_score"]
+            for i in range(len(ch_items) - 1)
+        ), f"Chapter {n} failed trend_score monotonicity check"
+        all_entries.extend(ch_items)
 
     by_score = sorted(all_entries, key=lambda x: (-x["score"], -x["view_count"], x["chapter_no"]))
     for idx, rec in enumerate(by_score, 1):
@@ -2002,6 +2830,7 @@ def build_corpus(use_cache: bool = True) -> dict:
             "distinct_institutes": len(institutes_out),
             "distinct_educators": len(educators_out),
             "distinct_channels": len({x["channel"].casefold() for x in all_entries}),
+            "distinct_languages": len({x["language"] for x in all_entries}),
             "queries_executed": len(chapter_tasks),
             "live_requests": STATS["requests"],
             "cached_requests": STATS["cached"],
@@ -2031,7 +2860,7 @@ def self_test() -> None:
     assert parse_duration_seconds("7:42:15") == 27735
     assert parse_duration_seconds("45:10") == 2710
 
-    cre_rot = re.compile(r"\b(rotational|rigid body|\brbd\b|moment of inertia)\b", re.I)
+    cre_rot = re.compile(r"\b(rotational|rigid body|\brbd\b|moment of inertia)\b|घूर्णी गति", re.I)
     good_pl = {
         "provider": "playlist",
         "video_id": "PL_A4M5IAkMacVaetkKqlCBstwK7TdjOa9",
@@ -2060,7 +2889,8 @@ def self_test() -> None:
     }
     assert not is_valid_chapter_candidate(bad_spam_channel, 35, "Physics", cre_rot)
 
-    bad_tamil = {
+    # Regional Tamil JEE lecture must now be accepted & canonically tagged as Tamil
+    good_tamil = {
         "provider": "youtube",
         "video_id": "zzzzzzzzzzz",
         "title": "Rotational Motion JEE Tamil One Shot",
@@ -2070,7 +2900,50 @@ def self_test() -> None:
         "view_count": 90000,
         "sample_lectures": [],
     }
-    assert not is_valid_chapter_candidate(bad_tamil, 35, "Physics", cre_rot)
+    assert is_valid_chapter_candidate(good_tamil, 35, "Physics", cre_rot)
+    assert resolve_language(good_tamil) == "Tamil"
+
+    # NEET-only biology & Class 10 must still be strictly rejected
+    bad_neet_bio = {
+        "provider": "youtube",
+        "video_id": "bbbbbbbbbbb",
+        "title": "Rotational Motion NEET Biology Botany One Shot",
+        "channel": "Vedantu JEE",
+        "lesson_count": 0,
+        "duration_sec": 5400,
+        "view_count": 50000,
+        "sample_lectures": [],
+    }
+    assert not is_valid_chapter_candidate(bad_neet_bio, 35, "Physics", cre_rot)
+
+    # Canonical language & exam classification checks across all Indian languages
+    assert resolve_language({"title": "Electrostatics EAPCET One Shot", "channel": "Vedantu Telugu JEE"}) == "Telugu"
+    assert resolve_language({"title": "Electrostatics Plus Two", "channel": "Xylem Plus Two"}) == "Malayalam"
+    assert resolve_language({"title": "KCET Physics Kannada", "channel": "PW Kannada"}) == "Kannada"
+    assert resolve_language({"title": "Matrices MHT-CET One Shot", "channel": "Dinesh Sir Live Study"}) == "Marathi"
+    assert resolve_language({"title": "Chemical Kinetics WBJEE", "channel": "BongMistry"}) == "Bengali"
+    assert resolve_language({"title": "Electrostatics GUJCET", "channel": "PW Gujarati"}) == "Gujarati"
+    assert resolve_language({"title": "Electrostatics CHSE", "channel": "PW Odia"}) == "Odia"
+    assert resolve_language({"title": "Electrostatics PSEB", "channel": "PW Punjabi"}) == "Punjabi"
+    assert resolve_language({"title": "स्थिर वैद्युतिकी One Shot", "channel": "Ashish Singh Lectures"}) == "Hindi"
+    assert resolve_language({"title": "Rotational Motion Revision Checklist", "channel": "Physics Galaxy"}) == "English"
+    assert resolve_language({"title": "Rotational Motion Manzil", "channel": "JEE Wallah"}) == "Hinglish"
+
+    cet_cand = {
+        "provider": "youtube",
+        "title": "Matrices One Shot | MHT-CET 2025",
+        "channel": "Dinesh Sir Live Study",
+        "duration_sec": 7200,
+    }
+    assert classify_exam_and_format(cet_cand)[0] == "State CETs & BITSAT"
+
+    board_cand = {
+        "provider": "youtube",
+        "title": "Solutions Complete One Shot | Class 12 CBSE Board Exam",
+        "channel": "Bharat Panchal - Chemistry Guruji 2.0",
+        "duration_sec": 7200,
+    }
+    assert classify_exam_and_format(board_cand)[0] == "Class 12 & Boards"
 
     assert is_allen_channel("ALLEN JEE")
     assert is_allen_channel("ALLEN Career Institute")
@@ -2097,7 +2970,7 @@ def self_test() -> None:
     assert is_valid_chapter_candidate(om_lco, 4, "Mathematics", re.compile(r"\bcomplex numbers?\b", re.I))
     assert resolve_educator(om_lco, "Mathematics", "Algebra") == "Om Sharma Sir (Uplift Maths)"
 
-    print("self-test ok (80 canonical IIT-JEE chapters, pure trend & verified-channel guard validated)", flush=True)
+    print("self-test ok (80 canonical chapters, all-India languages, CET/Board streams & pure trend guard validated)", flush=True)
 
 
 def main(argv: list[str]) -> int:
@@ -2112,13 +2985,20 @@ def main(argv: list[str]) -> int:
         f"  - {i['institute']:<32}: {i['total']:>4} ({i['playlists']:>3} PL, {i['videos']:>3} vids across {i['chapter_coverage']:>2} ch)"
         for i in out["institutes"]
     )
+    lang_counts = Counter(v["language"] for v in out["videos"])
+    lang_lines = "\n".join(f"  - {lg:<16}: {cnt:>4}" for lg, cnt in lang_counts.most_common())
+    exam_counts = Counter(v["target_exam"] for v in out["videos"])
+    exam_lines = "\n".join(f"  - {ex:<24}: {cnt:>4}" for ex, cnt in exam_counts.most_common())
     print(
-        f"\n=== JEETUBE 80-CHAPTER CORPUS REPORT ===\n"
+        f"\n=== JEETUBE 80-CHAPTER ALL-INDIA CORPUS REPORT ===\n"
         f"Chapters populated      : {m['chapters_populated']} / {m['chapters_total']}\n"
         f"Chapters with playlists : {m['chapters_with_playlists']} / {m['chapters_total']}\n"
-        f"Total JEE resources     : {m['entries_published']} ({m['playlists_published']} playlists, {m['videos_published']} lectures)\n"
-        f"Distinct JEE institutes : {m['distinct_institutes']}\n"
-        f"Distinct JEE educators  : {m['distinct_educators']} ({m['distinct_channels']} verified channels)\n"
+        f"Total PCM resources     : {m['entries_published']} ({m['playlists_published']} playlists, {m['videos_published']} lectures)\n"
+        f"Distinct institutes     : {m['distinct_institutes']}\n"
+        f"Distinct educators      : {m['distinct_educators']} ({m['distinct_channels']} verified channels)\n"
+        f"Distinct languages      : {m['distinct_languages']}\n"
+        f"Language Breakdown:\n{lang_lines}\n"
+        f"Target Exam Breakdown:\n{exam_lines}\n"
         f"Institute Breakdown:\n{inst_lines}\n"
         f"Output written to       : {OUT_PATH}",
         flush=True,
