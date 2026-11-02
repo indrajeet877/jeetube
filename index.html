@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    try {
+      document.querySelector('meta[name="color-scheme"]').content =
+        localStorage.getItem("color-scheme") ?? "light dark";
+    } catch {}
+  </script>
+  <title>JEETube — Complete Chapterwise IIT-JEE Main &amp; Advanced YouTube Directory</title>
+  <meta name="description" content="Structured 80-chapter IIT-JEE Main and JEE Advanced YouTube syllabus directory across Mathematics, Physics, and Chemistry — complete teacher playlists, marathon one-shots, PYQ revisions, and advanced problem sessions.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1120'/%3E%3Crect x='2' y='2' width='28' height='28' rx='5.5' fill='none' stroke='%2360a5fa' stroke-opacity='0.45'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-family='system-ui,-apple-system,sans-serif' font-weight='800' font-size='12.5' letter-spacing='0.5' fill='%23f8fafc'%3EJEE%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Subtle architectural micro-grain atmosphere (zero network requests) -->
+  <svg class="grain-defs" aria-hidden="true" width="0" height="0">
+    <filter id="studio-grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise"/>
+    </filter>
+  </svg>
+  <div class="grain-layer" aria-hidden="true">
+    <svg width="100%" height="100%" aria-hidden="true">
+      <rect width="100%" height="100%" filter="url(#studio-grain)"/>
+    </svg>
+  </div>
+
+  <a class="skip-link" href="#main-content">Skip to chapterwise JEE lectures</a>
+
+  <header class="site-header">
+    <div class="topbar">
+      <div class="brand-cluster">
+        <span class="brand-mark" aria-hidden="true">∑</span>
+        <div class="brand-meta">
+          <span class="brand-eyebrow">JEETUBE · OPEN FREE IIT-JEE EDUCATION INITIATIVE</span>
+        </div>
+      </div>
+
+      <nav class="utility-nav" aria-label="Corpus resources and appearance">
+        <a href="data/videos.json">Dataset JSON</a>
+        <span class="dot-sep" aria-hidden="true">·</span>
+        <a href="#colophon">How It Works</a>
+        <button type="button" id="theme-toggle" class="theme-btn" aria-label="Toggle color theme">
+          <span class="theme-option theme-to-dark">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+            <span class="visually-hidden">Switch to dark theme</span>
+          </span>
+          <span class="theme-option theme-to-light">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2m-7.07-14.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+            <span class="visually-hidden">Switch to light theme</span>
+          </span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="masthead">
+      <div class="masthead-main">
+        <div class="masthead-badge-row">
+          <span class="hero-pill">100% Free Self-Study Index</span>
+          <span class="hero-pill is-subtle">Zero NEET / Vlog / Clickbait Noise</span>
+        </div>
+        <h1>JEETube</h1>
+        <p class="masthead-lead">
+          Every major IIT-JEE Main &amp; JEE Advanced teacher playlist, full-chapter marathon, PYQ checklist, and Olympiad-grade problem session on YouTube — organized across all 80 syllabus chapters so any student can learn from India’s best faculty for free.
+        </p>
+      </div>
+
+      <dl class="telemetry" aria-label="Corpus and study progress">
+        <div class="stat-cell">
+          <dt>Complete PCM Syllabus</dt>
+          <dd id="stat-chapters">80 / 80 Chapters</dd>
+          <span class="stat-sub" id="stat-pl-coverage">100% Playlist Coverage</span>
+        </div>
+        <div class="stat-cell">
+          <dt>Structured Playlists</dt>
+          <dd id="stat-playlists">—</dd>
+          <span class="stat-sub">Full Zero-to-Adv Courses</span>
+        </div>
+        <div class="stat-cell">
+          <dt>One-Shots &amp; Boosters</dt>
+          <dd id="stat-videos">—</dd>
+          <span class="stat-sub" id="stat-educators">Across Top JEE Faculty</span>
+        </div>
+        <div class="stat-cell is-progress-cell">
+          <dt><label for="syllabus-progress">Your Syllabus Progress</label></dt>
+          <dd id="stat-progress">0 / 80 Done</dd>
+          <progress id="syllabus-progress" class="syllabus-progress" value="0" max="80"></progress>
+        </div>
+      </dl>
+    </div>
+
+    <p id="subline" class="subline-alert" role="alert" hidden></p>
+
+    <!-- 1. Separate Subject Worlds Switcher -->
+    <div class="subject-switcher-wrap">
+      <div class="subject-tabs" role="radiogroup" aria-label="Separate by IIT-JEE subject">
+        <button type="button" class="subj-tab" role="radio" data-subject="All" aria-checked="true" tabindex="0">
+          <span class="subj-icon is-all" aria-hidden="true">❖</span>
+          <span class="subj-label">All Subjects (PCM)</span>
+          <span class="subj-count" id="cnt-all">80 ch</span>
+        </button>
+        <button type="button" class="subj-tab" role="radio" data-subject="Mathematics" aria-checked="false" tabindex="-1">
+          <span class="subj-icon is-math" aria-hidden="true">∫</span>
+          <span class="subj-label">Mathematics</span>
+          <span class="subj-count" id="cnt-math">29 ch</span>
+        </button>
+        <button type="button" class="subj-tab" role="radio" data-subject="Physics" aria-checked="false" tabindex="-1">
+          <span class="subj-icon is-phys" aria-hidden="true">∇</span>
+          <span class="subj-label">Physics</span>
+          <span class="subj-count" id="cnt-phys">25 ch</span>
+        </button>
+        <button type="button" class="subj-tab" role="radio" data-subject="Chemistry" aria-checked="false" tabindex="-1">
+          <span class="subj-icon is-chem" aria-hidden="true">⇌</span>
+          <span class="subj-label">Chemistry</span>
+          <span class="subj-count" id="cnt-chem">26 ch</span>
+        </button>
+        <button type="button" class="subj-tab is-saved-tab" role="radio" data-subject="Saved" aria-checked="false" tabindex="-1">
+          <span class="subj-icon" aria-hidden="true">★</span>
+          <span class="subj-label">Saved Deck</span>
+          <span class="subj-count" id="cnt-saved">0</span>
+        </button>
+      </div>
+
+      <!-- Dynamic Sub-Branch / Unit Filter (e.g. Physical / Inorganic / Organic Chemistry, Calculus, Mechanics) -->
+      <div id="unit-bar" class="unit-bar" role="group" aria-label="Filter by subject branch or unit"></div>
+    </div>
+
+    <!-- 2. Student Study-Goal Quick Modes & Teacher Explorer -->
+    <div class="discovery-deck">
+      <div class="goal-strip" role="group" aria-label="Study mode and YouTube structure">
+        <span class="strip-kicker">Study Mode:</span>
+        <button type="button" class="goal-chip" data-goal="all" aria-pressed="true">
+          All Resources
+        </button>
+        <button type="button" class="goal-chip" data-goal="playlists" aria-pressed="false">
+          <span aria-hidden="true">▤</span> Full Playlists (Start from Zero)
+        </button>
+        <button type="button" class="goal-chip" data-goal="oneshot" aria-pressed="false">
+          <span aria-hidden="true">⚡</span> One-Shot Marathons (Backlog)
+        </button>
+        <button type="button" class="goal-chip" data-goal="revision" aria-pressed="false">
+          <span aria-hidden="true">🎯</span> Quick Revision &amp; PYQs
+        </button>
+        <button type="button" class="goal-chip" data-goal="advanced" aria-pressed="false">
+          <span aria-hidden="true">🏆</span> JEE Advanced Rank Boosters
+        </button>
+      </div>
+
+      <div class="teacher-strip-wrap">
+        <span class="strip-kicker">Top Faculty:</span>
+        <div id="teacher-chips" class="teacher-chips" role="group" aria-label="Quick filter by IIT-JEE teacher"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- Left Sticky 80-Chapter Syllabus Navigator -->
+    <aside class="syllabus-sidebar" aria-label="Chapterwise JEE syllabus">
+      <div class="sidebar-head">
+        <div>
+          <h2 class="sidebar-title">80-Chapter Index</h2>
+          <p class="sidebar-sub" id="sidebar-sub">Click any chapter to isolate</p>
+        </div>
+        <button type="button" id="clear-chapter-btn" class="sidebar-clear" hidden>Show all</button>
+      </div>
+      <div class="sidebar-filter-wrap">
+        <label class="visually-hidden" for="ch-filter">Find a syllabus chapter</label>
+        <input id="ch-filter" type="search" class="ch-filter-input" placeholder="Find chapter (e.g. Rotation, GOC, SOT, Ionic)…" spellcheck="false">
+      </div>
+      <nav id="syllabus-tree" class="syllabus-tree" aria-label="Chapters by unit"></nav>
+    </aside>
+
+    <!-- Main Content Column -->
+    <main id="main-content" class="main-column" tabindex="-1">
+      <search class="command-shell" aria-label="Search, filter, and sort JEE YouTube resources">
+        <div class="command-row-top">
+          <button type="button" id="open-syllabus-drawer" class="mobile-chapters-btn" aria-haspopup="dialog">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h10"/>
+            </svg>
+            <span id="mobile-ch-label">Chapters (80)</span>
+          </button>
+
+          <div class="search-field">
+            <label class="visually-hidden" for="q">Search chapters, topics, teachers, or YouTube channels</label>
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input
+              id="q"
+              type="search"
+              placeholder="Search any chapter, topic, or teacher (ABJ Sir, MT Sir, ALK Sir, NS Sir, NV Sir, SKM Sir, Eduniti, RBD, GOC)…"
+              enterkeyhint="search"
+              spellcheck="false"
+            >
+            <kbd id="key-hint" class="key-hint" aria-hidden="true">/</kbd>
+            <button type="button" id="clear-q" class="clear-btn" hidden aria-label="Clear search query">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="layout-toggle" role="group" aria-label="Card display layout">
+            <button type="button" class="layout-btn" data-layout="grid" aria-pressed="true" aria-label="Grid view">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+            </button>
+            <button type="button" class="layout-btn" data-layout="list" aria-pressed="false" aria-label="Compact list view">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="command-row-filters">
+          <!-- YouTube Type Filter (Playlists vs Videos) -->
+          <div class="segmented" role="group" aria-label="YouTube resource type">
+            <button type="button" class="seg-btn type-btn" data-type="all" aria-pressed="true">All Types</button>
+            <button type="button" class="seg-btn type-btn" data-type="playlist" aria-pressed="false">▤ Playlists</button>
+            <button type="button" class="seg-btn type-btn" data-type="youtube" aria-pressed="false">▶ Videos</button>
+          </div>
+
+          <!-- Target Exam Level -->
+          <div class="segmented" role="group" aria-label="Target JEE exam">
+            <button type="button" class="seg-btn exam-btn" data-exam="all" aria-pressed="true">All JEE</button>
+            <button type="button" class="seg-btn exam-btn" data-exam="JEE Advanced" aria-pressed="false">JEE Advanced</button>
+            <button type="button" class="seg-btn exam-btn" data-exam="JEE Main + Advanced" aria-pressed="false">Main + Adv</button>
+            <button type="button" class="seg-btn exam-btn" data-exam="JEE Main" aria-pressed="false">JEE Main</button>
+          </div>
+
+          <!-- Educator, Class, Language & Sort Controls -->
+          <div class="select-cluster">
+            <label class="visually-hidden" for="educator-select">Filter by teacher or educator</label>
+            <select id="educator-select" class="ctrl-select">
+              <option value="">Teacher: All Faculty</option>
+            </select>
+
+            <label class="visually-hidden" for="class-select">Filter by class level</label>
+            <select id="class-select" class="ctrl-select">
+              <option value="all">Class 11 &amp; 12</option>
+              <option value="Class 11">Class 11 Syllabus</option>
+              <option value="Class 12">Class 12 Syllabus</option>
+            </select>
+
+            <label class="visually-hidden" for="lang-select">Filter by teaching language</label>
+            <select id="lang-select" class="ctrl-select">
+              <option value="all">Medium: All</option>
+              <option value="Hinglish">Hinglish / Hindi</option>
+              <option value="English">English Medium</option>
+            </select>
+
+            <label class="visually-hidden" for="sort-select">Sort resources by</label>
+            <select id="sort-select" class="ctrl-select is-sort-select">
+              <option value="chapterwise">Sort: Syllabus Order (Ch 01 → 80)</option>
+              <option value="relevance">Sort: Best Relevance &amp; Faculty Rank</option>
+              <option value="views">Sort: Most Viewed on YouTube</option>
+              <option value="lessons">Sort: Deepest Playlists (Lectures ↓)</option>
+              <option value="duration_desc">Sort: Longest Marathon (Duration ↓)</option>
+              <option value="duration_asc">Sort: Quickest Revision (Duration ↑)</option>
+              <option value="weightage">Sort: Highest JEE Weightage First</option>
+            </select>
+          </div>
+        </div>
+      </search>
+
+      <div class="status-bar">
+        <p id="count" class="result-count">Loading 80-chapter IIT-JEE YouTube index…</p>
+        <p id="live-status" class="visually-hidden" aria-live="polite"></p>
+        <div id="active-filters" class="active-filters"></div>
+        <button type="button" id="reset-filters" class="reset-btn" hidden>Reset all filters</button>
+      </div>
+
+      <div id="list" class="content-stream"></div>
+    </main>
+  </div>
+
+  <footer id="colophon" class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-method">
+        <h2 class="footer-heading">Academic Curation &amp; Student-First Architecture</h2>
+        <p id="method">
+          Built specifically for self-study IIT-JEE Main and JEE Advanced aspirants across India. All 80 canonical chapters across Mathematics (29), Physics (25), and Chemistry (26 — Physical, Inorganic, Organic) are mapped 1-to-1 with YouTube’s native playlist and long-form lecture structure, pairing zero-to-Advanced full playlists with marathon one-shots, PYQ checklists, and Olympiad/Advanced problem sessions while filtering out NEET-only, Class 9/10, regional-mismatch, and non-academic clickbait noise.
+        </p>
+      </div>
+      <div class="footer-links">
+        <h2 class="footer-heading">Open Corpus &amp; Reproducibility</h2>
+        <ul role="list">
+          <li><a href="data/videos.json">Download Complete JSON Index (<code>data/videos.json</code>)</a></li>
+          <li><code>python3 scripts/build.py --self-test</code></li>
+          <li><code>python3 scripts/build.py</code></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Light-Dismiss Syllabus Drawer -->
+  <dialog id="syllabus-dialog" class="syllabus-dialog" closedby="any" aria-labelledby="drawer-title">
+    <div class="drawer-header">
+      <h2 id="drawer-title">80-Chapter JEE Syllabus</h2>
+      <form method="dialog">
+        <button type="submit" class="dialog-close" aria-label="Close chapter drawer">✕</button>
+      </form>
+    </div>
+    <div class="drawer-search-wrap">
+      <label class="visually-hidden" for="drawer-ch-filter">Filter chapters</label>
+      <input id="drawer-ch-filter" type="search" class="ch-filter-input" placeholder="Search chapter name or number…" spellcheck="false">
+    </div>
+    <div id="drawer-syllabus-tree" class="syllabus-tree"></div>
+  </dialog>
+
+  <!-- Light-Dismiss Distraction-Free YouTube Course / Lecture Player -->
+  <dialog id="player-dialog" class="player-dialog" closedby="any" aria-labelledby="player-title">
+    <div class="dialog-header">
+      <div class="dialog-meta">
+        <span id="player-badge" class="badge"></span>
+        <span id="player-channel" class="dialog-channel"></span>
+      </div>
+      <div class="dialog-actions">
+        <a id="player-ext" class="dialog-yt-cta" href="#" target="_blank" rel="noopener noreferrer">
+          Open on YouTube <span aria-hidden="true">↗</span>
+        </a>
+        <form method="dialog">
+          <button type="submit" class="dialog-close" aria-label="Close video player">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+    <h2 id="player-title" class="dialog-title"></h2>
+    <div id="player-stage" class="player-stage"></div>
+    <div id="player-samples" class="player-samples" hidden></div>
+  </dialog>
+
+  <noscript>
+    <p class="noscript-banner">JEETube requires JavaScript to load and filter <code>data/videos.json</code>.</p>
+  </noscript>
+  <script src="app.js"></script>
+</body>
+</html>
