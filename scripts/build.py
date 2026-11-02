@@ -287,7 +287,7 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         31, "Physics", "Mechanics", "Class 11", "High", "Main + Adv",
         "Kinematics (1D, Projectile & Relative Motion)",
-        r"\b(kinematics|rectilinear|projectile|relative motion|motion in a (?:straight|plane)|1d|2d)",
+        r"\b(kinematics|rectilinear|projectile|relative motion|motion in a (?:straight|plane)|motion in (?:one|two|1|2)\s*dimensions?|1d|2d)",
         "Kinematics Physics",
         "Motion in a Straight Line Projectile",
     ),
@@ -315,7 +315,7 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         35, "Physics", "Mechanics", "Class 11", "Very High", "Main + Adv",
         "Rotational Mechanics (Rigid Body Dynamics)",
-        r"\b(rotational|rigid body|\brbd\b|moment of inertia|torque|angular momentum|rolling)",
+        r"\b(rotation\w*|rigid body|\brbd\b|moment of inertia|torque|angular momentum|rolling)",
         "Rotational Motion Physics",
         "Rigid Body Dynamics Rotational",
     ),
@@ -350,7 +350,7 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         40, "Physics", "Waves & Thermodynamics", "Class 11", "High", "Main + Adv",
         "Mechanical Waves & Sound Waves",
-        r"\b(waves on string|string waves|sound waves|standing waves|organ pipe|doppler|beats|wave motion|waves\b)",
+        r"\b(waves on string|string waves|sound waves|\bsound\b|standing waves|organ pipe|doppler|beats|wave motion|waves\b)",
         "Waves Class 11 Physics",
         "Sound Waves String Waves Doppler",
     ),
@@ -371,7 +371,7 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         43, "Physics", "Electrodynamics", "Class 12", "Very High", "Main + Adv",
         "Electrostatics & Gauss's Law",
-        r"\b(electrostatics?|electric charges|electric field|gauss|electric potential|dipole)",
+        r"\b(electrostat\w*|electric charges|electric field|gauss|electric potential|dipole|coulomb)",
         "Electrostatics Class 12 Physics",
         "Electric Charges and Fields Potential",
     ),
@@ -434,7 +434,7 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
     (
         52, "Physics", "Modern & Experimental", "Class 12", "Very High", "Main + Adv",
         "Modern Physics (Photoelectric, Atoms & X-Rays)",
-        r"\b(modern physics|photoelectric|dual nature|bohr|atomic physics|atoms\b|de broglie|x[- ]?rays?)",
+        r"\b(modern physics|photo?electric|dual nature|bohr|atomic physics|atoms\b|de broglie|x[- ]?rays?)",
         "Modern Physics Class 12",
         "Dual Nature Atoms Photoelectric Physics",
     ),
@@ -639,6 +639,64 @@ SYLLABUS: list[tuple[int, str, str, str, str, str, str, str, str, str]] = [
 ]
 
 TEACHER_PLAYLIST_SWEEPS: list[tuple[str, str]] = [
+    # ALLEN Top Priority Sweeps
+    ("Mathematics", "ALLEN JEE Mathematics"),
+    ("Physics", "ALLEN JEE Physics"),
+    ("Chemistry", "ALLEN JEE Chemistry"),
+    ("Physics", "ALLEN JEE Irodov Score Advanced"),
+    # Aakash & BYJU'S Sweeps
+    ("Mathematics", "Aakash BYJU'S JEE Maths"),
+    ("Physics", "Aakash BYJU'S JEE Physics"),
+    ("Chemistry", "Aakash BYJU'S JEE Chemistry"),
+    ("Mathematics", "Aakash JEE Class 11 12 Maths"),
+    ("Physics", "Aakash JEE Class 11 12 Physics"),
+    ("Chemistry", "Aakash JEE Class 11 12 Chemistry"),
+    ("Mathematics", "BYJUS JEE Maths"),
+    ("Physics", "BYJUS JEE Physics"),
+    ("Chemistry", "BYJUS JEE Chemistry"),
+    # Unacademy Ecosystem Sweeps
+    ("Mathematics", "Unacademy JEE Live Daily Maths"),
+    ("Physics", "Unacademy JEE Live Daily Physics"),
+    ("Chemistry", "Unacademy JEE Live Daily Chemistry"),
+    ("Mathematics", "Unacademy Atoms Bounce Back Maths"),
+    ("Physics", "Unacademy Atoms Bounce Back Physics"),
+    ("Chemistry", "Unacademy Atoms Bounce Back Chemistry"),
+    ("Mathematics", "JEE Nexus by Unacademy Maths"),
+    ("Physics", "JEE Nexus by Unacademy Physics"),
+    ("Chemistry", "JEE Nexus by Unacademy Chemistry"),
+    ("Chemistry", "Kota Pulse by Unacademy Chemistry"),
+    ("Physics", "Kota Pulse by Unacademy Physics"),
+    ("Mathematics", "Unacademy Accelerate JEE Maths"),
+    # Vedantu JEE Sweeps
+    ("Mathematics", "Vedantu JEE Maths"),
+    ("Physics", "Vedantu JEE Physics"),
+    ("Chemistry", "Vedantu JEE Chemistry"),
+    # VMC, Sri Chaitanya / Infinity Learn, Motion, Etoos, Reliable, Resonance, eSaral, ATP STAR
+    ("Mathematics", "VMC JEE Vidyamandir Classes Maths"),
+    ("Physics", "VMC JEE Vidyamandir Classes Physics"),
+    ("Chemistry", "VMC JEE Vidyamandir Classes Chemistry"),
+    ("Mathematics", "Sri Chaitanya Academy JEE Maths"),
+    ("Physics", "Sri Chaitanya Academy JEE Physics"),
+    ("Chemistry", "Sri Chaitanya Academy JEE Chemistry"),
+    ("Mathematics", "Infinity Learn JEE Mathematics"),
+    ("Physics", "Infinity Learn JEE Physics"),
+    ("Chemistry", "Infinity Learn JEE Chemistry"),
+    ("Mathematics", "Motion Kota JEE Maths"),
+    ("Physics", "Motion Kota JEE Physics"),
+    ("Chemistry", "Motion Kota JEE Chemistry"),
+    ("Physics", "Motion NV Sir Physics"),
+    ("Mathematics", "ETOOS IIT JEE Mathematics"),
+    ("Physics", "ETOOS IIT JEE Physics"),
+    ("Chemistry", "ETOOS IIT JEE Chemistry"),
+    ("Physics", "Reliable Institute Kota JEE Physics"),
+    ("Chemistry", "Reliable Institute Kota JEE Chemistry"),
+    ("Mathematics", "Resonance Eduventures IIT JEE"),
+    ("Mathematics", "eSaral IIT JEE Maths"),
+    ("Physics", "eSaral IIT JEE Physics"),
+    ("Chemistry", "eSaral IIT JEE Chemistry"),
+    ("Chemistry", "ATP STAR IIT JEE Organic Chemistry"),
+    ("Physics", "ATP STAR IIT JEE Physics"),
+    # Top Faculty Sweeps
     ("Mathematics", "Mohit Tyagi IIT JEE Mathematics"),
     ("Mathematics", "Mathsmerizing Full Course"),
     ("Mathematics", "Mathsmerizing Symposium Compendium"),
@@ -677,31 +735,120 @@ TEACHER_PLAYLIST_SWEEPS: list[tuple[str, str]] = [
     ("Chemistry", "Canvas Classes Pahul sir Chemistry"),
 ]
 
+INSTITUTE_VIDEO_SWEEPS: list[tuple[str, str]] = [
+    ("Mathematics", "ALLEN JEE One Shot Maths"),
+    ("Physics", "ALLEN JEE One Shot Physics"),
+    ("Chemistry", "ALLEN JEE One Shot Chemistry"),
+    ("Mathematics", "Aakash JEE One Shot Maths"),
+    ("Physics", "Aakash JEE One Shot Physics"),
+    ("Chemistry", "Aakash JEE One Shot Chemistry"),
+    ("Mathematics", "BYJU'S JEE Maths One Shot"),
+    ("Physics", "BYJU'S JEE Physics One Shot"),
+    ("Chemistry", "BYJU'S JEE Chemistry One Shot"),
+    ("Mathematics", "JEE@Aakash Maths One Shot"),
+    ("Physics", "JEE@Aakash Physics One Shot"),
+    ("Chemistry", "JEE@Aakash Chemistry One Shot"),
+    ("Mathematics", "Bounce Back Unacademy Atoms Maths One Shot"),
+    ("Physics", "Bounce Back Unacademy Atoms Physics One Shot"),
+    ("Chemistry", "Bounce Back Unacademy Atoms Chemistry One Shot"),
+    ("Mathematics", "Kota Pulse by Unacademy Maths JEE"),
+    ("Physics", "Kota Pulse by Unacademy Physics JEE"),
+    ("Chemistry", "Kota Pulse by Unacademy Chemistry JEE"),
+    ("Mathematics", "VMC JEE One Shot Maths"),
+    ("Physics", "VMC JEE One Shot Physics"),
+    ("Chemistry", "VMC JEE One Shot Chemistry"),
+    ("Mathematics", "Vidyamandir Classes JEE One Shot Maths"),
+    ("Physics", "Vidyamandir Classes JEE One Shot Physics"),
+    ("Chemistry", "Vidyamandir Classes JEE One Shot Chemistry"),
+    ("Mathematics", "Sri Chaitanya JEE One Shot Maths"),
+    ("Physics", "Sri Chaitanya JEE One Shot Physics"),
+    ("Chemistry", "Sri Chaitanya JEE One Shot Chemistry"),
+    ("Mathematics", "Sri Chaitanya Academy JEE One Shot"),
+    ("Physics", "Sri Chaitanya Academy JEE One Shot"),
+    ("Mathematics", "Infinity Learn JEE One Shot Maths"),
+    ("Physics", "Infinity Learn JEE One Shot Physics"),
+    ("Chemistry", "Infinity Learn JEE One Shot Chemistry"),
+    ("Physics", "Calorimetry Heat Transfer ALLEN JEE"),
+    ("Physics", "Alternating Current EM Waves ALLEN JEE"),
+    ("Mathematics", "Motion Kota JEE One Shot Maths"),
+    ("Physics", "Motion Kota JEE One Shot Physics"),
+    ("Chemistry", "Motion Kota JEE One Shot Chemistry"),
+    ("Mathematics", "eSaral JEE Revision One Shot Maths"),
+    ("Physics", "eSaral JEE Revision One Shot Physics"),
+    ("Chemistry", "eSaral JEE Revision One Shot Chemistry"),
+    ("Mathematics", "Rankers JEE One Shot Maths"),
+    ("Physics", "Rankers JEE One Shot Physics"),
+    ("Chemistry", "Rankers JEE One Shot Chemistry"),
+]
+
 # Strict Curated Allowlist of Legitimate IIT-JEE Educators & Official Institute Channels
 # Guarantees ZERO spam/profane/random personal accounts or non-JEE teaching channels.
 VERIFIED_CHANNEL_PATTERNS = (
+    # ALLEN (Top Priority)
+    "allen jee",
+    "allen career institute",
+    "allen digital",
+    "allen online",
+    # Aakash & BYJU'S
+    "aakash jee",
+    "jee@aakash",
+    "aakash byju",
+    "byju's jee",
+    "byjus jee",
+    # Unacademy Ecosystem
+    "unacademy jee",
+    "unacademy atoms",
+    "jee nexus",
+    "jeefinity",
+    "kota pulse by unacademy",
+    "unacademy accelerate",
+    "unacademy catalysts",
+    "let's crack iit jee",
+    "jee 24x7",
+    "jee legends",
+    "jee alchemy",
+    # Competishun / Mohit Tyagi
     "mohit tyagi",
     "competishun",
-    "physics galaxy",
-    "mathsmerizing",
-    "maths unplugged",
-    "eduniti",
-    "vora classes",
+    # Physics Wallah (PW)
     "jee wallah",
     "physics wallah",
     "lakshya jee",
     "arjuna jee",
     "jee challengers",
     "pw jee",
-    "unacademy jee",
-    "unacademy atoms",
-    "jee nexus",
-    "jeefinity",
-    "unacademy accelerate",
-    "let's crack iit jee",
-    "jee 24x7",
-    "jee legends",
-    "jee alchemy",
+    # VMC, Sri Chaitanya / Infinity Learn, Motion, Etoos, Reliable, Resonance, eSaral, ATP STAR
+    "vmc jee",
+    "vidyamandir classes",
+    "sri chaitanya academy jee",
+    "sri chaitanya academy",
+    "sri chaitanya educational",
+    "infinity learn jee",
+    "infinity learn",
+    "jee one",
+    "motion kota",
+    "motion jee",
+    "motion nv sir",
+    "motion education",
+    "reliable institute",
+    "resonance eduventures",
+    "etoos",
+    "esaral",
+    "atp star",
+    "iit jee prep by iquanta",
+    "rankers- jee",
+    "rankers jee",
+    "vedantu jee",
+    "apni kaksha",
+    "careerwill",
+    "iit school",
+    "nucleus",
+    # Top Independent JEE Specialists & Kota HODs
+    "physics galaxy",
+    "mathsmerizing",
+    "maths unplugged",
+    "eduniti",
+    "vora classes",
     "mathongo",
     "jeeongo",
     "dexterchem",
@@ -714,12 +861,6 @@ VERIFIED_CHANNEL_PATTERNS = (
     "invisible mechanics",
     "pankaj sir chemistry",
     "canvas classes",
-    "vedantu jee",
-    "allen jee",
-    "motion jee",
-    "atp star",
-    "esaral",
-    "apni kaksha",
     "mathematically inclined",
     "neha agrawal",
     "bhannat maths",
@@ -730,8 +871,6 @@ VERIFIED_CHANNEL_PATTERNS = (
     "vj sir",
     "skm sir",
     "akk sir",
-    "iit school",
-    "careerwill",
     "ms chouhan",
     "sameer bansal",
     "physics heist",
@@ -778,6 +917,9 @@ HARD_REJECT_RE = re.compile(
     r"vaathi|tamil|telugu|malayalam|kannada|bangla|bengali|marathi|gujarati|odia|"
     r"vlog|prank|controversy|exposed|roast|reaction\s+video|cutoff|marks\s+vs\s+percentile|"
     r"college\s+review|hostel\s+tour|josaa|counselling|time\s*table|how\s+to\s+crack|"
+    r"paper\s+solutions?|paper\s+discussion|question\s+paper\s+solutions?|video\s+solutions|answer\s+key|memory\s+based|"
+    r"toppers?\s+talk|topper'?s?\s+success|success\s+story|success\s+meet|full\s+interview|"
+    r"parents\s+of\s+jee|orientation\s+session|study\s+material\s+review|dress\s+code|admit\s+card|"
     r"strategy\s+to\s+score|best\s+books\s+for|motivation|motivational|shorts|#shorts)\b",
     re.I,
 )
@@ -1082,19 +1224,101 @@ def _parse_video(vr: dict) -> dict | None:
     }
 
 
+def is_allen_channel(channel: str) -> bool:
+    low = channel.casefold()
+    if "neet" in low and "jee" not in low and "iit" not in low:
+        return False
+    return any(k in low for k in ("allen jee", "allen career institute", "allen digital", "allen online"))
+
+
 def is_verified_jee_channel(channel: str) -> bool:
     low = channel.casefold()
+    # Reject NEET-only institute channels (e.g. ALLEN NEET, Sri Chaitanya Academy NEET, Aakash NEET)
+    # while allowing multi-exam channels whose name explicitly includes JEE/IIT (e.g. eSaral - JEE, NEET...).
+    if re.search(r"\bneet\b", low) and not re.search(r"\b(jee|iit)\b", low):
+        return False
     return any(p in low for p in VERIFIED_CHANNEL_PATTERNS)
 
 
 def is_advanced_channel(channel: str) -> bool:
     low = channel.casefold()
-    return any(t in low for t in ADVANCED_FACULTY_CHANNELS)
+    return is_allen_channel(channel) or any(t in low for t in ADVANCED_FACULTY_CHANNELS)
+
+
+def resolve_institute(cand: dict) -> str:
+    ch_low = cand["channel"].lower()
+    blob = f"{cand['title']} {cand['channel']}".lower()
+
+    if is_allen_channel(cand["channel"]):
+        return "ALLEN"
+    if any(k in ch_low for k in ("aakash", "jee@aakash", "byju")):
+        return "Aakash & BYJU'S"
+    if any(
+        k in ch_low
+        for k in (
+            "unacademy",
+            "jee nexus",
+            "jeefinity",
+            "jee legends",
+            "kota pulse",
+            "let's crack iit jee",
+            "jee 24x7",
+            "jee alchemy",
+        )
+    ):
+        return "Unacademy"
+    if "mohit tyagi" in ch_low or "competishun" in ch_low:
+        return "Competishun (Mohit Tyagi)"
+    if any(k in ch_low for k in ("jee wallah", "physics wallah", "lakshya jee", "arjuna jee", "jee challengers", "pw jee")):
+        return "Physics Wallah (PW)"
+    if "physics galaxy" in ch_low or "eduniti" in ch_low:
+        return "Physics Galaxy & Eduniti"
+    if "vedantu" in ch_low:
+        return "Vedantu JEE"
+    if "vmc" in ch_low or "vidyamandir" in ch_low:
+        return "VMC (Vidyamandir)"
+    if "sri chaitanya" in ch_low or "infinity learn" in ch_low:
+        return "Sri Chaitanya & Infinity Learn"
+    if "esaral" in ch_low:
+        return "eSaral"
+    if any(
+        k in ch_low
+        for k in (
+            "motion",
+            "etoos",
+            "reliable institute",
+            "resonance",
+            "atp star",
+            "iquanta",
+            "skm sir",
+            "akk sir",
+            "vj sir",
+            "vishal joshi",
+            "pms sir",
+            "nucleus",
+            "ms chouhan",
+            "sameer bansal",
+            "careerwill",
+            "iit school",
+        )
+    ) or "atp star" in blob:
+        return "Motion, Etoos & Kota Institutes"
+    if "vora classes" in ch_low or "mathongo" in ch_low or "jeeongo" in ch_low:
+        return "Vora Classes & MathonGo"
+    return "Independent JEE Specialists"
 
 
 def resolve_educator(cand: dict, subject: str, unit: str) -> str:
     blob = f"{cand['title']} {cand['channel']}".lower()
     ch_low = cand["channel"].lower()
+
+    if is_allen_channel(cand["channel"]):
+        return "ALLEN JEE"
+
+    if any(k in ch_low for k in ("aakash", "jee@aakash", "byju")):
+        if "byju" in blob:
+            return "Aakash BYJU'S JEE"
+        return "Aakash JEE"
 
     if "mohit tyagi" in ch_low or "competishun" in ch_low:
         if subject == "Mathematics":
@@ -1106,9 +1330,20 @@ def resolve_educator(cand: dict, subject: str, unit: str) -> str:
         return "ALK Sir (Mohit Tyagi)"
 
     teacher_rules = [
-        (r"\bnishant vora\b|\bnv\s*sir\b", "Nishant Vora (NV Sir)"),
+        (r"\bnishant vora\b|\bnv\s*sir\b", "Nishant Vora (NV Sir)" if "motion" not in ch_low else "NV Sir (Motion Kota)"),
         (r"\bsakshi vora\b|\bsv\s*ma'?am\b", "Sakshi Vora (SV Ma'am)"),
         (r"vora classes", "Nishant Vora (NV Sir)" if subject == "Mathematics" else "Sakshi Vora (SV Ma'am)"),
+        (r"jee legends|unacademy atoms", "Unacademy Atoms (BounceBack)"),
+        (r"kota pulse by unacademy", "Kota Pulse (Unacademy)"),
+        (r"vmc jee|vidyamandir classes", "VMC (Vidyamandir Classes)"),
+        (r"sri chaitanya|infinity learn", "Sri Chaitanya / Infinity Learn"),
+        (r"motion kota|motion jee|motion education", "Motion Kota JEE"),
+        (r"etoos", "ETOOS Kota Faculty"),
+        (r"reliable institute", "Reliable Institute Kota"),
+        (r"resonance eduventures", "Resonance Kota"),
+        (r"esaral", "eSaral JEE"),
+        (r"atp star|vineet khatri", "ATP STAR Kota"),
+        (r"rankers-?\s*jee", "Rankers JEE"),
         (r"physics galaxy|\bashish arora\b", "Ashish Arora (Physics Galaxy)"),
         (r"eduniti|\bmohit goenka\b", "Mohit Goenka (Eduniti)"),
         (r"mathsmerizing", "Mathsmerizing"),
@@ -1233,8 +1468,8 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     if not is_verified_jee_channel(channel):
         return False
 
-    # 2. Reject NEET-only, Class 8/9/10, Regional non-English/Hindi, and clickbait
-    if HARD_REJECT_RE.search(f"{title} {channel}") or re.search(r"\bneet\b", channel, re.I):
+    # 2. Reject NEET-only, Class 8/9/10, Regional non-English/Hindi, and non-lecture noise (evaluated on title)
+    if HARD_REJECT_RE.search(title):
         return False
     if re.search(r"\bneet\b", title, re.I) and not re.search(r"\b(jee|iit)\b", title, re.I):
         return False
@@ -1256,6 +1491,13 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
         return False
     if ch_no == 23 and re.search(r"\bindefinite integration\b", title, re.I) and not re.search(r"\bdefinite\b", title, re.I):
         return False
+    # Prevent Ch 62 (Liquid Solutions) from matching generic exam/paper "Solutions"
+    if ch_no == 62 and not re.search(
+        r"\b(liquid|dilute|colligative|raoult|van'?t\s*hoff|one[\s-]*shot|1[\s-]*shot|full\s+chapter|class\s*12|chemistry|parmanu|bounce\s*back)\b",
+        title,
+        re.I,
+    ):
+        return False
 
     # 4. Reject full-subject megacompilations ("all chapters", "in order") unless chapter title matches
     if cand["provider"] == "playlist" and re.search(r"\bin order\b|\ball chapters\b|\bcomplete (?:physics|chemistry|maths)\b", title, re.I):
@@ -1271,28 +1513,29 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     if not chapter_re.search(title):
         return False
 
-    # 7. Cross-Subject Guards (checks title & teacher cues without blocking "Physics Wallah" channel on Maths/Chem!)
-    blob_tc = f"{title} {channel}"
+    # 7. Cross-Subject Guards (checks hashtag-stripped title & teacher cues without blocking "Physics Wallah" channel on Maths/Chem!)
+    title_clean = re.sub(r"#\w+", "", title)
+    blob_tc = f"{title_clean} {channel}"
     if subject == "Mathematics":
         if re.search(
             r"\b(abj sir|physics galaxy|eduniti|rohit mishra|saleem sir|rajwant sir|alk sir|ns sir|sakshi|dexterchem|kinematics|electrostatics|mole concept|organic chemistry)\b",
             blob_tc,
             re.I,
-        ) or re.search(r"\b(jee\s+physics|class\s*1[12]\s*physics|jee\s+chemistry)\b", title, re.I):
+        ) or re.search(r"\b(jee\s+physics|class\s*1[12]\s*physics|jee\s+chemistry)\b", title_clean, re.I):
             return False
     elif subject == "Physics":
         if re.search(
             r"\b(alk sir|ns sir|akk sir|skm sir|sakshi|pankaj sir|faisal|dexterchem|om pandey|sachin rana|mathsmerizing|mathongo|nishant vora|mole concept|enthalpy|gibbs|chemical thermodynamics|chemical kinetics|gaseous state)\b",
             blob_tc,
             re.I,
-        ) or re.search(r"\b(chemistry|class\s*1[12]\s*maths|jee\s+mathematics)\b", title, re.I):
+        ) or re.search(r"\b(chemistry|class\s*1[12]\s*maths|jee\s+mathematics)\b", title_clean, re.I):
             return False
     elif subject == "Chemistry":
         if re.search(
             r"\b(abj sir|physics galaxy|saleem sir|rajwant|eduniti|rohit mishra|vinay uppal|mathsmerizing|nishant vora|mathongo|kinematics|rotational|carnot|photoelectric|x[- ]?rays|modern physics|nuclear physics)\b",
             blob_tc,
             re.I,
-        ) or re.search(r"\b(jee\s+physics|class\s*1[12]\s*physics|jee\s+maths)\b", title, re.I):
+        ) or re.search(r"\b(jee\s+physics|class\s*1[12]\s*physics|jee\s+maths)\b", title_clean, re.I):
             return False
 
     # 8. Duration & Lesson Count Floor
@@ -1307,22 +1550,63 @@ def is_valid_chapter_candidate(cand: dict, ch_no: int, subject: str, chapter_re:
     return True
 
 
-def authority_score(cand: dict, fmt: str) -> float:
-    score = 45.0
-    if is_advanced_channel(cand["channel"]):
-        score += 16.0
+def parse_age_months(published_text: str) -> float:
+    """Parse YouTube relative published text ('3 weeks ago', 'Streamed 4 months ago') into months."""
+    if not published_text:
+        return 18.0
+    low = published_text.lower()
+    m = re.search(r"(\d+)\s*(hour|day|week|month|year)", low)
+    if not m:
+        return 18.0
+    n = float(m.group(1))
+    unit = m.group(2)
+    if unit == "hour":
+        return 0.15
+    if unit == "day":
+        return max(0.2, n / 30.0)
+    if unit == "week":
+        return max(0.3, (n * 7.0) / 30.0)
+    if unit == "month":
+        return max(0.5, n)
+    if unit == "year":
+        return max(12.0, n * 12.0)
+    return 18.0
+
+
+def compute_trend_metrics(cand: dict, fmt: str) -> tuple[float, int, float, str]:
+    """Compute pure YouTube audience trend score with ZERO coaching/institute priority.
+
+    Returns (age_months, views_per_month, trend_score, trend_badge).
+    """
     if cand["provider"] == "playlist":
-        score += 36.0 + min(cand["lesson_count"], 60) * 0.48
+        lessons = cand["lesson_count"]
+        # Organic playlist completeness score (balanced so surging high-velocity videos lead Trending,
+        # while deep structured courses still appear cleanly alongside them).
+        t_score = 64.0 + min(lessons, 45) * 0.42 + (3.5 if cand.get("sample_lectures") else 0.0)
+        badge = f"📚 {lessons} Lectures" if lessons else "📚 Full Playlist"
+        return 12.0, 0, round(t_score, 2), badge
+
+    views = max(int(cand.get("view_count") or 0), 1)
+    age_m = parse_age_months(cand.get("published") or "")
+    vpm = int(round(views / max(age_m, 0.75)))
+
+    # Pure YouTube traction formula: monthly view velocity + total student reach + freshness
+    velocity_pts = math.log10(max(vpm, 1)) * 13.5
+    reach_pts = math.log10(views) * 9.5
+    freshness_pts = 8.0 if age_m <= 6.0 else (4.5 if age_m <= 14.0 else (2.0 if age_m <= 24.0 else 0.0))
+    depth_pts = 3.5 if cand.get("duration_sec", 0) >= 5400 else 1.5
+    t_score = round(velocity_pts + reach_pts + freshness_pts + depth_pts, 2)
+
+    if vpm >= 35_000 or (age_m <= 8.0 and views >= 120_000):
+        badge = "🔥 Trending"
+    elif views >= 1_000_000:
+        badge = "⭐ Most Loved"
+    elif views >= 250_000 or vpm >= 12_000:
+        badge = "📈 Popular"
     else:
-        views = max(cand["view_count"], 1)
-        score += min(math.log10(views) * 7.5, 48.0)
-        if cand["duration_sec"] >= 14400:
-            score += 16.0
-        elif cand["duration_sec"] >= 5400:
-            score += 10.0
-    if fmt == "Full Course":
-        score += 10.0
-    return round(score, 2)
+        badge = f"⚡ {fmt}"
+
+    return round(age_m, 1), vpm, t_score, badge
 
 
 def build_pedagogy_note(cand: dict, educator: str, exam: str, fmt: str, chapter_name: str) -> str:
@@ -1351,9 +1635,15 @@ def build_corpus(use_cache: bool = True) -> dict:
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{alt_q} JEE", SP_PLAYLIST_ONLY))
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} JEE one shot", SP_LONG_VIDEOS))
         chapter_tasks.append(("chapter", ch_no, subject, cre, f"{alt_q} JEE PYQ revision", SP_LONG_VIDEOS))
+        # Dedicated ALLEN & Aakash/BYJU'S chapterwise sweeps across all 80 chapters
+        chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} ALLEN JEE", SP_PLAYLIST_ONLY))
+        chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} ALLEN JEE", SP_LONG_VIDEOS))
+        chapter_tasks.append(("chapter", ch_no, subject, cre, f"{core_q} Aakash BYJUS JEE", SP_LONG_VIDEOS))
 
     for subj, tq in TEACHER_PLAYLIST_SWEEPS:
         chapter_tasks.append(("sweep", 0, subj, None, tq, SP_PLAYLIST_ONLY))
+    for subj, vq in INSTITUTE_VIDEO_SWEEPS:
+        chapter_tasks.append(("sweep", 0, subj, None, vq, SP_LONG_VIDEOS))
 
     print(
         f"Executing {len(chapter_tasks)} YouTube InnerTube queries across {len(SYLLABUS)} JEE chapters...",
@@ -1372,7 +1662,7 @@ def build_corpus(use_cache: bool = True) -> dict:
             return kind, ch_no, subject, kept
         return kind, 0, subject, cands
 
-    with ThreadPoolExecutor(max_workers=16) as pool:
+    with ThreadPoolExecutor(max_workers=24) as pool:
         futures = [pool.submit(worker, t) for t in chapter_tasks]
         for fut in as_completed(futures):
             kind, ch_no, subject, items = fut.result()
@@ -1414,22 +1704,24 @@ def build_corpus(use_cache: bool = True) -> dict:
                 continue
             seen_local.add(gkey)
             exam, fmt = classify_exam_and_format(cand)
-            sc = authority_score(cand, fmt)
-            enriched.append((sc, exam, fmt, cand))
+            age_m, vpm, t_score, t_badge = compute_trend_metrics(cand, fmt)
+            enriched.append((t_score, age_m, vpm, t_badge, exam, fmt, cand))
 
-        playlists_pool = sorted([x for x in enriched if x[3]["provider"] == "playlist"], key=lambda x: -x[0])
-        videos_pool = sorted([x for x in enriched if x[3]["provider"] == "youtube"], key=lambda x: -x[0])
+        # Pure YouTube Trend & Popularity pools — ZERO artificial institute priority
+        videos_pool = sorted([x for x in enriched if x[6]["provider"] == "youtube"], key=lambda x: (-x[0], -x[6]["view_count"]))
+        playlists_pool = sorted([x for x in enriched if x[6]["provider"] == "playlist"], key=lambda x: (-x[0], -x[6]["lesson_count"]))
 
         unique_ch: list[dict] = []
         edu_cap: dict[str, int] = {}
 
         def _try_take(pool_items: list, limit_count: int, per_edu_max: int) -> None:
-            for sc, exam, fmt, cand in pool_items:
+            for t_score, age_m, vpm, t_badge, exam, fmt, cand in pool_items:
                 if len(unique_ch) >= limit_count:
                     break
                 gkey = (cand["provider"], cand["video_id"])
                 if gkey in seen_global:
                     continue
+                institute = resolve_institute(cand)
                 educator = resolve_educator(cand, subject, unit)
                 ekey = f"{educator.casefold()}::{cand['provider']}"
                 if edu_cap.get(ekey, 0) >= per_edu_max:
@@ -1447,6 +1739,7 @@ def build_corpus(use_cache: bool = True) -> dict:
                         "title": cand["title"],
                         "channel": cand["channel"],
                         "channel_url": cand["channel_url"],
+                        "institute": institute,
                         "educator": educator,
                         "language": lang,
                         "thumbnail": cand["thumbnail"],
@@ -1465,19 +1758,31 @@ def build_corpus(use_cache: bool = True) -> dict:
                         "views_text": cand["views_text"],
                         "view_count": cand["view_count"],
                         "published": cand["published"],
-                        "score": sc,
+                        "age_months": age_m,
+                        "views_per_month": vpm,
+                        "trend_score": t_score,
+                        "trend_badge": t_badge,
+                        "score": t_score,
                         "note": build_pedagogy_note(cand, educator, exam, fmt, ch_name),
                         "sample_lectures": cand.get("sample_lectures") or [],
                     }
                 )
 
-        # Balanced selection: up to 10 diverse Full Playlists + up to 8 diverse Long-Form Lectures = up to 18/chapter
-        _try_take(playlists_pool, 10, 2)
-        _try_take(videos_pool, len(unique_ch) + 8, 2)
-        if len(unique_ch) < 16:
-            _try_take(playlists_pool + videos_pool, 16, 3)
+        # Balanced selection purely by YouTube Trend & Popularity (12 top trending videos + 10 top playlists)
+        _try_take(videos_pool, 12, 2)
+        _try_take(playlists_pool, len(unique_ch) + 10, 2)
+        if len(unique_ch) < 20:
+            _try_take(videos_pool + playlists_pool, 22, 3)
 
-        unique_ch.sort(key=lambda r: (-r["score"], -r["lesson_count"], -r["view_count"]))
+        # Sort strictly by pure YouTube trend_score (velocity + views + recency) — zero institute bias
+        unique_ch.sort(
+            key=lambda r: (
+                -r["trend_score"],
+                -r["views_per_month"],
+                -r["view_count"],
+                -r["lesson_count"],
+            )
+        )
         pl_cnt = sum(1 for r in unique_ch if r["provider"] == "playlist")
 
         yt_pl_q = urllib.parse.quote_plus(f"{ch_name} IIT JEE")
@@ -1543,7 +1848,49 @@ def build_corpus(use_cache: bool = True) -> dict:
                 "chapter_coverage": len(b["chapters"]),
             }
         )
-    educators_out.sort(key=lambda e: (-e["total"], -e["playlists"], e["educator"]))
+    educators_out.sort(
+        key=lambda e: (
+            -e["total"],
+            -e["playlists"],
+            e["educator"],
+        )
+    )
+
+    inst_buckets: dict[str, dict] = {}
+    for rec in all_entries:
+        inst = rec["institute"]
+        if inst not in inst_buckets:
+            inst_buckets[inst] = {
+                "institute": inst,
+                "total": 0,
+                "playlists": 0,
+                "videos": 0,
+                "chapters": set(),
+            }
+        ib = inst_buckets[inst]
+        ib["total"] += 1
+        ib["chapters"].add(rec["chapter_no"])
+        if rec["provider"] == "playlist":
+            ib["playlists"] += 1
+        else:
+            ib["videos"] += 1
+
+    institutes_out = [
+        {
+            "institute": inst,
+            "total": ib["total"],
+            "playlists": ib["playlists"],
+            "videos": ib["videos"],
+            "chapter_coverage": len(ib["chapters"]),
+        }
+        for inst, ib in inst_buckets.items()
+    ]
+    institutes_out.sort(
+        key=lambda i: (
+            -i["total"],
+            i["institute"],
+        )
+    )
 
     playlists_total = sum(1 for x in all_entries if x["provider"] == "playlist")
     chapters_with_pl = sum(1 for c in syllabus_out if c["playlist_count"] > 0)
@@ -1557,12 +1904,14 @@ def build_corpus(use_cache: bool = True) -> dict:
             "entries_published": len(all_entries),
             "playlists_published": playlists_total,
             "videos_published": len(all_entries) - playlists_total,
+            "distinct_institutes": len(institutes_out),
             "distinct_educators": len(educators_out),
             "distinct_channels": len({x["channel"].casefold() for x in all_entries}),
             "queries_executed": len(chapter_tasks),
             "live_requests": STATS["requests"],
             "cached_requests": STATS["cached"],
         },
+        "institutes": institutes_out,
         "educators": educators_out,
         "syllabus": syllabus_out,
         "videos": all_entries,
@@ -1628,7 +1977,16 @@ def self_test() -> None:
     }
     assert not is_valid_chapter_candidate(bad_tamil, 35, "Physics", cre_rot)
 
-    print("self-test ok (80 canonical IIT-JEE chapters & verified-channel guard validated)", flush=True)
+    assert is_allen_channel("ALLEN JEE")
+    assert is_allen_channel("ALLEN Career Institute")
+    assert not is_allen_channel("ALLEN NEET")
+    assert is_verified_jee_channel("eSaral - JEE, NEET, Class 9 & 10 Preparation")
+    assert not is_verified_jee_channel("Sri Chaitanya Academy NEET")
+    assert resolve_institute({"title": "Rotational Motion", "channel": "ALLEN JEE"}) == "ALLEN"
+    assert resolve_institute({"title": "Conic Sections | BYJU'S JEE", "channel": "Aakash JEE"}) == "Aakash & BYJU'S"
+    assert resolve_institute({"title": "BounceBack Calculus", "channel": "JEE Legends"}) == "Unacademy"
+
+    print("self-test ok (80 canonical IIT-JEE chapters, ALLEN priority & verified-channel guard validated)", flush=True)
 
 
 def main(argv: list[str]) -> int:
@@ -1639,12 +1997,18 @@ def main(argv: list[str]) -> int:
     use_cache = "--fresh" not in argv
     out = build_corpus(use_cache=use_cache)
     m = out["meta"]
+    inst_lines = "\n".join(
+        f"  - {i['institute']:<32}: {i['total']:>4} ({i['playlists']:>3} PL, {i['videos']:>3} vids across {i['chapter_coverage']:>2} ch)"
+        for i in out["institutes"]
+    )
     print(
         f"\n=== JEETUBE 80-CHAPTER CORPUS REPORT ===\n"
         f"Chapters populated      : {m['chapters_populated']} / {m['chapters_total']}\n"
         f"Chapters with playlists : {m['chapters_with_playlists']} / {m['chapters_total']}\n"
         f"Total JEE resources     : {m['entries_published']} ({m['playlists_published']} playlists, {m['videos_published']} lectures)\n"
+        f"Distinct JEE institutes : {m['distinct_institutes']}\n"
         f"Distinct JEE educators  : {m['distinct_educators']} ({m['distinct_channels']} verified channels)\n"
+        f"Institute Breakdown:\n{inst_lines}\n"
         f"Output written to       : {OUT_PATH}",
         flush=True,
     )
